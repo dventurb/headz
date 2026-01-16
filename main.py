@@ -1,15 +1,18 @@
 import pygame as pg
 
-def main():
+from game import initialize_game
 
-    # Initialize pygame 
-    if pg.get_sdl_version()[0] == 2:
-        pg.mixer.pre_init(44100, 32, 2, 1024)
+WIDTH, HEIGHT = 900, 600
+
+def main():
+    pg.mixer.init()
     pg.init()
-    
-    if pg.mixer and not pg.mixer.get_init():
-        print("No sound.")
-        pg.mixer = None
+
+# Set the display mode
+    screen = pg.display.set_mode((WIDTH, HEIGHT))
+
+    initialize_game()
+
 
 if __name__ == "__main__":
     main()
