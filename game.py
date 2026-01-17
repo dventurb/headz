@@ -1,79 +1,39 @@
-import pygame as pg
-from os import sys
-import cv2
+import pygame as pg 
 
-from widgets import ButtonImage
+class Game:
+    def __init__(self, screen, clock, gameStateManager):
+        self.screen = screen
+        self.clock = clock 
+        self.gameStateManager = gameStateManager
 
-WIDTH, HEIGHT = 1536, 1024
+        self.intro = None
+        self.mainMenu = None
+        #self.playerSelectMenu = None 
+        #self.gameMenu = None
 
-def initialize_game(screen):
-   
-    # Intro video
-    # References: https://stackoverflow.com/questions/21356439/how-to-load-and-play-a-video-in-pygame
-    video = cv2.VideoCapture("assets/video.mp4")
-    video_play, video_image = video.read()
+        self.states = {}
 
-    if not video_play:
-        print("Warning, can't load the video.")
-        sys.exit(1)
+    def run(self):
+        running = True
+        while running:
+            events = pg.event.get()
+            for event in events:
+                if event.type == pg.QUIT:
+                    running = False
+            
+            self.states[self.gameStateManager.get_state()].run(events)
 
-    fps = video.get(cv2.CAP_PROP_FPS)
-
-    clock = pg.time.Clock()
-
-    running = True
-    music_play = False
-   
-    # Play intro sound effect
-    pg.mixer.music.load("assets/sounds/intro.mp3")
-    pg.mixer.music.play(1)
-    
-    while running:
-        clock.tick(fps)
-
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                running = False
-        
-        video_play, video_image = video.read()
-
-        if video_play:
-            video_surf = pg.image.frombuffer(video_image.tobytes(), video_image.shape[1::-1], "BGR")
-            video_surf = pg.transform.scale(video_surf, (WIDTH, HEIGHT))
-            screen.blit(video_surf, (0, 0))
-        else:
-            if not music_play:
-                pg.mixer.music.load("assets/sounds/loop.mp3")
-                pg.mixer.music.play(-1) 
-                music_play = True
-
-                background = pg.image.load("assets/background.png").convert()
-                screen.blit(background, (0, 0))
-
-                btn_start = ButtonImage(pg.image.load("assets/buttons/start.png").convert_alpha(), (560, 800), click_btn)
-
-            btn_start.on_click(event)
-
-            update_button(btn_start)
-            screen.blit(background, (0, 0))
-
-            btn_start.draw(screen)
-            pg.display.update(btn_start.rect)
-
-        pg.display.flip()
+            pg.display.update()
+            self.clock.tick
 
 
+class GameStateManager:
+    def __init__(self, currentState):
+        self.currentState = currentState
 
-def click_btn(button):
-    print("click")
+    def get_state(self):
+        return self.currentState
 
+    def set_state(self, state):
+        self.currentState = state
 
-def update_button(button):
-    button.check_hover()
-
-    if button.hovered == True:
-        button.img = button.img_hovered 
-        button.rect = button.img.get_rect(center=button.rect.center)
-    else:
-        button.img = button.img_original
-        button.rect = button.img.get_rect(center=button.rect.center)

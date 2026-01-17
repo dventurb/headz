@@ -1,8 +1,8 @@
 import pygame as pg
 
-from game import initialize_game
-
-WIDTH, HEIGHT = 1536, 1024
+from game import Game, GameStateManager
+from screens import IntroScreen, MainMenu
+from config import WIDTH, HEIGHT
 
 def main():
     pg.mixer.pre_init(44100, -16, 2, 2048)
@@ -11,10 +11,23 @@ def main():
     # Set the display mode
     screen = pg.display.set_mode((WIDTH, HEIGHT))
 
+    clock = pg.time.Clock()
+   
     # Title 
     pg.display.set_caption("Headz")
+    
+    game = Game(screen, clock, GameStateManager("intro"))
+    
+    game.intro = IntroScreen(game.screen, game.clock, game.gameStateManager) 
+    game.mainMenu = MainMenu(game.screen, game.clock, game.gameStateManager)
+    game.states = {
+                "intro": game.intro, 
+                "mainMenu": game.mainMenu, 
+                #"playerSelectMenu": game.playerSelectMenu, 
+                #"gameMenu": game.gameMenu
+               }
 
-    initialize_game(screen)
+    game.run()
 
     pg.quit()
     sys.exit(0)
