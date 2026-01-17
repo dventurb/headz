@@ -16,6 +16,8 @@ def main():
 
     initialize_game(screen)
 
+    pg.quit()
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
