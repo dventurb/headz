@@ -52,14 +52,28 @@ def initialize_game(screen):
 
                 btn_start = ButtonImage(pg.image.load("assets/buttons/start.png").convert_alpha(), (560, 800), click_btn)
 
-                btn_start.draw(screen)
-
             btn_start.on_click(event)
+
+            update_button(btn_start)
+            screen.blit(background, (0, 0))
+
+            btn_start.draw(screen)
+            pg.display.update(btn_start.rect)
 
         pg.display.flip()
 
 
 
-def click_btn():
+def click_btn(button):
     print("click")
 
+
+def update_button(button):
+    button.check_hover()
+
+    if button.hovered == True:
+        button.img = button.img_hovered 
+        button.rect = button.img.get_rect(center=button.rect.center)
+    else:
+        button.img = button.img_original
+        button.rect = button.img.get_rect(center=button.rect.center)
