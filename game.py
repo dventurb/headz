@@ -1,6 +1,8 @@
 import pygame as pg
-import os
+from os import sys
 import cv2
+
+from widgets import Button
 
 WIDTH, HEIGHT = 1536, 1024
 
@@ -48,4 +50,11 @@ def initialize_game(screen):
             background = pg.image.load("assets/background.png").convert()
             screen.blit(background, (0, 0))
 
+            button = Button("START", "#475F77", 400, 80, (568, 900))
+            button.draw(screen)
+
         pg.display.flip()
+
+    
+    pg.quit()
+    sys.exit(0)
