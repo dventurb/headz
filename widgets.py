@@ -55,11 +55,11 @@ class ButtonImage:
         else:
             self.hovered = False
 
-    def on_click(self, event):
+    def on_click(self, event, data):
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1: 
             if self.rect.collidepoint(event.pos):
                 self.pressed = True
         if event.type == pg.MOUSEBUTTONUP and self.pressed == True:
-            self.callback(self)
+            self.callback(data)
             self.pressed = False
 

@@ -11,17 +11,17 @@ class IntroScreen:
         self.clock = clock
         self.gameStateManager = gameStateManager 
 
+        self.video = cv2.VideoCapture("assets/videos/video.mp4") 
+
     def run(self, events):
-        # Intro video
         # References: https://stackoverflow.com/questions/21356439/how-to-load-and-play-a-video-in-pygame
-        video = cv2.VideoCapture("assets/video.mp4")
-        video_play, video_image = video.read()
+        video_play, video_image = self.video.read()
 
         if not video_play:
             print("Warning, can't load the video.")
             sys.exit(1)
 
-        fps = video.get(cv2.CAP_PROP_FPS)
+        fps = self.video.get(cv2.CAP_PROP_FPS)
 
         # Play intro sound effect
         pg.mixer.music.load("assets/sounds/intro.mp3")
@@ -35,12 +35,12 @@ class IntroScreen:
             
             self.screen.blit(video_surf, (0, 0))
 
-            video_play, video_image = video.read()
+            video_play, video_image = self.video.read()
 
             pg.display.flip()
 
 
-        video.release()
+        self.video.release()
         
         # End of the Intro, set screen to main menu
         self.gameStateManager.set_state("mainMenu")
