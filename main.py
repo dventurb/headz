@@ -2,7 +2,7 @@ import pygame as pg
 
 from game import initialize_game
 
-WIDTH, HEIGHT = 900, 600
+WIDTH, HEIGHT = 1536, 1024
 
 def main():
     pg.mixer.pre_init(44100, -16, 2, 2048)
@@ -14,7 +14,7 @@ def main():
     # Title 
     pg.display.set_caption("Headz")
 
-    initialize_game()
+    initialize_game(screen)
 
 
 if __name__ == "__main__":
