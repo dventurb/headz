@@ -48,6 +48,12 @@ class PlayerSelectMenu:
             self.buttons["left"].on_click(event, self)
             self.buttons["right"].on_click(event, self)
 
+            if event.type == pg.KEYUP:
+                if event.key == pg.K_LEFT:
+                    click_button_left(self)
+                if event.key == pg.K_RIGHT:
+                    click_button_right(self)
+
         for button in self.buttons.values():
             update_button(self, button)
 
