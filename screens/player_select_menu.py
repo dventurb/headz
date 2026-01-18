@@ -22,9 +22,9 @@ class PlayerSelectMenu:
     
         # The next lines of code need a better aproach, I will definitely change this.
         players = [
-                Player("Bedas", "assets/characters/bedas.png", "assets/bedas.png", 50, 30, 30),
-                Player("Lage", "assets/characters/lage.png", "assets/lage.png", 70, 50, 60),
-                Player("João David", "assets/characters/joaodavid.png", "assets/joaodavid.png", 70, 60, 50)
+                Player("Bedas", "assets/characters/bedas/sprite.png", "assets/characters/bedas/font.png", 50, 30, 30),
+                Player("Lage", "assets/characters/lage/sprite.png", "assets/characters/lage/font.png", 70, 50, 60),
+                Player("João David", "assets/characters/joaodavid/sprite.png", "assets/characters/joaodavid/font.png", 70, 60, 50)
                 ]
 
         self.players = PlayerManager()
