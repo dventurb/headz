@@ -9,7 +9,7 @@ class Game:
         self.intro = None
         self.mainMenu = None
         self.playerSelectMenu = None 
-        #self.gameMenu = None
+        self.gameMenu = None
 
         self.states = {}
 
@@ -27,12 +27,16 @@ class Game:
 
 
 class GameStateManager:
-    def __init__(self, currentState):
-        self.currentState = currentState
+    def __init__(self, current_state):
+        self.current_state = current_state
+
+        self.selected_player = None
+        self.opponent = None
+        self.selected_stadium = None
 
     def get_state(self):
-        return self.currentState
+        return self.current_state
 
     def set_state(self, state):
-        self.currentState = state
+        self.current_state = state
 

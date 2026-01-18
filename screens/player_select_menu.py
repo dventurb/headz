@@ -1,5 +1,6 @@
 import pygame as pg
 import cv2
+import random
 
 from game import Game, GameStateManager
 from config import WIDTH, HEIGHT
@@ -27,17 +28,17 @@ class PlayerSelectMenu:
                 Player("João David", "assets/characters/joaodavid/sprite.png", "assets/characters/joaodavid/font.png", 70, 60, 50)
                 ]
 
-        self.players = PlayerManager()
+        self.playerManager = PlayerManager()
         for player in players:
             player.unlock = True
-            self.players.add_player(player)
+            self.playerManager.add_player(player)
 
         self.current_player_index = 0 
         
         self.character = {
-                "player": self.players.players[self.current_player_index],
-                "font": Image(self.players.players[self.current_player_index].font, (768, 200)), 
-                "sprite": Image(self.players.players[self.current_player_index].sprite, (768, 512))
+                "player": self.playerManager.players[self.current_player_index],
+                "font": Image(self.playerManager.players[self.current_player_index].font, (768, 200)), 
+                "sprite": Image(self.playerManager.players[self.current_player_index].sprite, (768, 512))
                 }
 
 
@@ -45,8 +46,8 @@ class PlayerSelectMenu:
         self.draw()
 
         for event in events:
-            self.buttons["left"].on_click(event, self)
-            self.buttons["right"].on_click(event, self)
+            for button in self.buttons.values():
+                button.on_click(event, self)
 
             if event.type == pg.KEYUP:
                 if event.key == pg.K_LEFT:
@@ -67,24 +68,42 @@ class PlayerSelectMenu:
 
 
 def click_button_left(self):
-    self.current_player_index = (self.current_player_index - 1) % len(self.players.players)
+    pg.mixer.Sound("assets/sounds/switch.mp3").play()
 
-    self.character["player"] = self.players.players[self.current_player_index]
-    self.character["font"] = Image(self.players.players[self.current_player_index].font, (768, 200))
-    self.character["sprite"] = Image(self.players.players[self.current_player_index].sprite, (768, 512))
+    self.current_player_index = (self.current_player_index - 1) % len(self.playerManager.players)
+
+    self.character["player"] = self.playerManager.players[self.current_player_index]
+    self.character["font"] = Image(self.playerManager.players[self.current_player_index].font, (768, 200))
+    self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].sprite, (768, 512))
 
 
 def click_button_right(self):
-    self.current_player_index = (self.current_player_index + 1) % len(self.players.players)
+    pg.mixer.Sound("assets/sounds/switch.mp3").play()
+    
+    self.current_player_index = (self.current_player_index + 1) % len(self.playerManager.players)
 
-    self.character["player"] = self.players.players[self.current_player_index]
-    self.character["font"] = Image(self.players.players[self.current_player_index].font, (768, 200))
-    self.character["sprite"] = Image(self.players.players[self.current_player_index].sprite, (768, 512))
+    self.character["player"] = self.playerManager.players[self.current_player_index]
+    self.character["font"] = Image(self.playerManager.players[self.current_player_index].font, (768, 200))
+    self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].sprite, (768, 512))
 
 
 def click_button_select(self):
-    test = self.current_player_index
+    pg.mixer.Sound("assets/sounds/start.mp3").play()
+    
+    pg.mixer.music.stop()
 
+    self.gameStateManager.selected_player = self.playerManager.players[self.current_player_index]
+
+    opponents = [
+            player for player in self.playerManager.players 
+            if player != self.gameStateManager.selected_player 
+            ]
+    self.gameStateManager.opponent = random.choice(opponents)
+    
+    #self.gameStateManager.selected_stadium
+
+    # Set screen to game play scene
+    self.gameStateManager.set_state("gameMenu")
 
 def update_button(self, button):
     button.check_hover()

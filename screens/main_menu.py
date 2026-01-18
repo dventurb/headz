@@ -37,6 +37,8 @@ class MainMenu:
 
 
 def click_button_start(self):
+    pg.mixer.Sound("assets/sounds/start.mp3").play()
+
     # Set screen to player select menu
     self.gameStateManager.set_state("playerSelectMenu")
 
