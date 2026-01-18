@@ -4,7 +4,7 @@ import cv2
 from game import Game, GameStateManager
 from config import WIDTH, HEIGHT
 from player import Player, PlayerManager 
-from widgets import ButtonImage
+from widgets import ButtonImage, Image
 
 class PlayerSelectMenu:
     def __init__(self, screen, clock, gameStateManager):
@@ -13,42 +13,47 @@ class PlayerSelectMenu:
         self.gameStateManager = gameStateManager 
 
         self.background = pg.image.load("assets/backgrounds/select_player_menu.png").convert()
-
-    def run(self, events):
-
-        self.screen.blit(self.background, (0, 0))
+        
+        self.buttons = {
+                "left":  ButtonImage(pg.image.load("assets/buttons/left.png"), (418, 438), click_button_left),
+                "right": ButtonImage(pg.image.load("assets/buttons/right.png"), (990, 438), click_button_right)
+                }
 
         players = [
                 Player("Bedas", "assets/characters/bedas.png", 50, 30, 30),
                 Player("Lage", "assets/characters/lage.png", 70, 50, 60),
                 Player("João David", "assets/characters/joaodavid.png", 70, 60, 50)
-                   ]
+                ]
 
         self.players = PlayerManager()
         for player in players:
             player.unlock = True
             self.players.add_player(player)
 
-        pg.font.init()
-        my_font = pg.font.Font("assets/fonts/Crashcourse.ttf", 180)
-        label = my_font.render(self.players.players[0].name.upper(), True, (255, 179, 67))
-        rect = label.get_rect(center=(768, 200))
-        self.screen.blit(label, rect)
+        self.character = {
+                "player": self.players.players[0],
+                "font": Image("assets/bedas.png", (768, 200)), 
+                "sprite": Image(self.players.players[0].image, (768, 512))
+                }
 
-        # Left Button
-        btn_left = ButtonImage(pg.image.load("assets/buttons/left.png").convert_alpha(), (418, 438), click_button_left)
-        btn_left.img = pg.transform.scale(btn_left.img, (128, 147))
-        btn_left.draw(self.screen)
+    def run(self, events):
+        self.draw()
+
+        for event in events:
+            self.buttons["left"].on_click(event, None)
+            self.buttons["right"].on_click(event, None)
+
+        update_button(self, self.buttons["left"])
+        update_button(self, self.buttons["right"])
+
+    def draw(self):
+        self.screen.blit(self.background, (0, 0))
+        self.character["font"].draw(self.screen)
+        self.character["sprite"].draw(self.screen)
         
-        # Character Sprite
-        sprite = pg.image.load(self.players.players[0].image).convert_alpha()
-        self.screen.blit(sprite, sprite.get_rect(topleft=(618, 301)))
-        
-        # Right Button
-        btn_right = ButtonImage(pg.image.load("assets/buttons/right.png").convert_alpha(), (990, 438), click_button_left)
-        btn_right.img = pg.transform.scale(btn_right.img, (128, 147))
-        btn_right.draw(self.screen)
-    
+        self.buttons["left"].draw(self.screen)
+        self.buttons["right"].draw(self.screen)
+
 
 def load_players_sprites(screen, players):
     sprites = pg.image.load(player.image).convert_alpha()
@@ -56,3 +61,14 @@ def load_players_sprites(screen, players):
 
 def click_button_left(self):
     print("click")
+
+def click_button_right(self):
+    print("click")
+
+def update_button(self, button):
+    button.check_hover()
+
+    if button.hovered == True:
+        button.img = button.img_hovered 
+    else:
+        button.img = button.img_original

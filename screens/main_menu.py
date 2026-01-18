@@ -19,6 +19,8 @@ class MainMenu:
     
     
     def run(self, events):
+        self.draw()
+
         if not self.play_music:
             pg.mixer.music.load("assets/sounds/loop.mp3")
             pg.mixer.music.play(-1)
@@ -28,11 +30,10 @@ class MainMenu:
             self.button.on_click(event, self)
 
         update_button(self.button)
+
+    def draw(self):
         self.screen.blit(self.background, (0, 0))
-
         self.button.draw(self.screen)
-        pg.display.update(self.button.rect)
-
 
 
 def click_button_start(self):
@@ -45,7 +46,5 @@ def update_button(button):
 
     if button.hovered == True:
         button.img = button.img_hovered 
-        button.rect = button.img.get_rect(center=button.rect.center)
     else:
         button.img = button.img_original
-        button.rect = button.img.get_rect(center=button.rect.center)

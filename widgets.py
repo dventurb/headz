@@ -63,3 +63,12 @@ class ButtonImage:
             self.callback(data)
             self.pressed = False
 
+
+class Image:
+    def __init__(self, image, position):
+        self.image = pg.image.load(image).convert_alpha()
+        self.rect = self.image.get_rect(center=position)
+
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
