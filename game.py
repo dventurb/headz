@@ -24,7 +24,6 @@ class Game:
             self.states[self.gameStateManager.get_state()].run(events)
 
             pg.display.update()
-            self.clock.tick
 
 
 class GameStateManager:

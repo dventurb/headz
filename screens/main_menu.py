@@ -24,8 +24,6 @@ class MainMenu:
             pg.mixer.music.play(-1)
             self.play_music = True
 
-            self.screen.blit(self.background, (0, 0))
-        
         for event in events:
             self.button.on_click(event, self)
 
