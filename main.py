@@ -26,7 +26,7 @@ def main():
     game.states = {
                 "intro": game.intro, 
                 "mainMenu": game.mainMenu, 
-                "playerSelectMenu": game.playerSelectMenu, 
+                "playerSelectMenu": game.playerSelectMenu,
                 "gameMenu": game.gameMenu
                }
 

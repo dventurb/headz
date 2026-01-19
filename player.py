@@ -1,10 +1,14 @@
 import pygame as pg 
 
 class Player:
-    def __init__(self, name: str, sprite: str, font: str, shot: int, jump: int, speed: int):
+    def __init__(self, name: str, path: str, shot: int, jump: int, speed: int):
         self.name = name
-        self.sprite = sprite
-        self.font = font
+
+        self.front = f"{path}front.png"
+        self.font =  f"{path}name.png"
+        self.side_right = f"{path}side_right.png"
+        self.side_left = f"{path}side_left.png"
+
         self.shot = shot 
         self.jump = jump 
         self.speed = speed

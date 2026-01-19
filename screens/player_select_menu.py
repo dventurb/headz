@@ -23,9 +23,9 @@ class PlayerSelectMenu:
     
         # The next lines of code need a better aproach, I will definitely change this.
         players = [
-                Player("Bedas", "assets/characters/bedas/sprite.png", "assets/characters/bedas/font.png", 50, 30, 30),
-                Player("Lage", "assets/characters/lage/sprite.png", "assets/characters/lage/font.png", 70, 50, 60),
-                Player("João David", "assets/characters/joaodavid/sprite.png", "assets/characters/joaodavid/font.png", 70, 60, 50)
+                Player("Bedas", "assets/characters/bedas/", 50, 30, 30),
+                Player("Lage", "assets/characters/lage/", 70, 50, 60),
+                Player("João David", "assets/characters/joaodavid/", 70, 60, 50)
                 ]
 
         self.playerManager = PlayerManager()
@@ -38,7 +38,7 @@ class PlayerSelectMenu:
         self.character = {
                 "player": self.playerManager.players[self.current_player_index],
                 "font": Image(self.playerManager.players[self.current_player_index].font, (768, 200)), 
-                "sprite": Image(self.playerManager.players[self.current_player_index].sprite, (768, 512))
+                "sprite": Image(self.playerManager.players[self.current_player_index].front, (768, 512))
                 }
 
 
@@ -74,7 +74,7 @@ def click_button_left(self):
 
     self.character["player"] = self.playerManager.players[self.current_player_index]
     self.character["font"] = Image(self.playerManager.players[self.current_player_index].font, (768, 200))
-    self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].sprite, (768, 512))
+    self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].front, (768, 512))
 
 
 def click_button_right(self):
@@ -84,7 +84,7 @@ def click_button_right(self):
 
     self.character["player"] = self.playerManager.players[self.current_player_index]
     self.character["font"] = Image(self.playerManager.players[self.current_player_index].font, (768, 200))
-    self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].sprite, (768, 512))
+    self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].front, (768, 512))
 
 
 def click_button_select(self):
@@ -101,7 +101,7 @@ def click_button_select(self):
     self.gameStateManager.opponent = random.choice(opponents)
     
     #self.gameStateManager.selected_stadium
-
+    
     # Set screen to game play scene
     self.gameStateManager.set_state("gameMenu")
 

@@ -9,7 +9,6 @@ class Game:
         self.intro = None
         self.mainMenu = None
         self.playerSelectMenu = None 
-        self.gameMenu = None
 
         self.states = {}
 
@@ -20,9 +19,9 @@ class Game:
             for event in events:
                 if event.type == pg.QUIT:
                     running = False
-            
-            self.states[self.gameStateManager.get_state()].run(events)
 
+            self.states[self.gameStateManager.get_state()].run(events)
+            
             pg.display.update()
 
 
