@@ -1,8 +1,9 @@
 import pygame as pg
 
 from config import WIDTH, HEIGHT
-
 from widgets import Image
+
+import random 
 
 class GameMenu:
     def __init__(self, screen, clock, gameStateManager):
@@ -17,8 +18,9 @@ class GameMenu:
         self.ball = {
                 "sprite": Image("assets/ball/ball.png", (768, 100)),
                 "position": [768, 100],
-                "velocity": 0,
-                "falldown": True
+                "velocity": [0, 0],
+                "falldown": True,
+                "bounce": True
                 }
 
         self.player = None
@@ -52,35 +54,63 @@ class GameMenu:
             pg.mixer.music.load("assets/sounds/portugal.mp3")
             pg.mixer.music.play(-1)
             self.play_music = True
-
+       
+       # Movement the player
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
-            position = self.players["player"]["position"] - (self.player.speed / 10)
+            position = self.players["player"]["position"] - (self.player.speed * 0.1)
             if position <= 0:
                 self.players["player"]["position"] = 0
             elif position > 0:
                 self.players["player"]["position"] = position
             update_position(self, self.player.side_left)
         if keys[pg.K_RIGHT]:
-            position = self.players["player"]["position"] + (self.player.speed / 10)
+            position = self.players["player"]["position"] + (self.player.speed * 0.1)
             if position >= WIDTH:
                 self.players["player"]["position"] = WIDTH
             elif position < WIDTH:
                 self.players["player"]["position"] = position
             update_position(self, self.player.side_right)
-        
+      
+        # References: https://stackoverflow.com/questions/62998806/how-to-make-a-bouncy-ball-in-pygame-python
+        # Ball falling down with bouncy effect
         if self.ball["falldown"]:
-            if self.ball["position"][1] < 850:
-                self.ball["velocity"] += 0.5
-                self.ball["position"][1] += self.ball["velocity"]
-                move_ball(self)
-            else:
-                self.ball["falldown"] = False
-
-                pg.mixer.Sound("assets/sounds/ball_drop.mp3").play()
             
-                self.ball["velocity"] += 0
-                self.ball["position"][1] = 850
+            # Still falling
+            if self.ball["position"][1] < 850:
+                self.ball["velocity"][1] += 0.2 # y value 
+                self.ball["velocity"][0] = random.choice([self.ball["velocity"][0] + 0.02, self.ball["velocity"][0] - 0.02]) # Random select the x value (side where the ball will land)
+
+                self.ball["position"][1] += self.ball["velocity"][1]
+                self.ball["position"][0] += self.ball["velocity"][0]
+
+                print("Falling:")
+                print(f"Velocity: {self.ball["velocity"][1]}")
+                print(f"Positon: {self.ball["position"][1]}")
+                move_ball(self)
+            
+            # Hit the ground
+            else:
+                # Create a bouncy effect
+                if self.ball["velocity"][1] > 0:
+                    print()
+                    print("Hit the ground")
+                    pg.mixer.Sound("assets/sounds/ball_drop.mp3").play()
+                    self.ball["velocity"][1] *= -0.9
+                    self.ball["position"][1] += self.ball["velocity"][1]
+                else:
+                    self.ball["falldown"] = False
+
+                move_ball(self)
+        
+        # Left wall 
+        if self.ball["position"][0] <= 0:
+            self.ball["velocity"][0] = abs(self.ball["velocity"][0])
+        
+        # Right wall
+        if self.ball["position"][0] >= WIDTH:
+            self.ball["velocity"][0] = -abs(self.ball["velocity"][0])
+
 
     def draw(self):
         self.screen.blit(self.stadium, (0, 0))

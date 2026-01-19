@@ -21,13 +21,9 @@ class IntroScreen:
             print("Warning, can't load the video.")
             sys.exit(1)
 
-        fps = self.video.get(cv2.CAP_PROP_FPS)
-
         # Play intro sound effect
         pg.mixer.music.load("assets/sounds/intro.mp3")
         pg.mixer.music.play(1)
-
-        self.clock.tick(fps)
 
         while video_play:
             video_surf = pg.image.frombuffer(video_image.tobytes(), video_image.shape[1::-1], "BGR")

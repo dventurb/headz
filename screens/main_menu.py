@@ -16,7 +16,7 @@ class MainMenu:
         self.play_music = False
 
         self.button = ButtonImage(pg.image.load("assets/buttons/start.png").convert_alpha(), (560, 800), click_button_start)
-    
+
     
     def run(self, events):
         self.draw()

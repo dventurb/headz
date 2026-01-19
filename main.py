@@ -10,8 +10,10 @@ def main():
 
     # Set the display mode
     screen = pg.display.set_mode((WIDTH, HEIGHT))
-
+    
+    # FPS
     clock = pg.time.Clock()
+    clock.tick(50)
    
     # Title 
     pg.display.set_caption("Headz")
