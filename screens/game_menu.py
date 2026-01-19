@@ -14,6 +14,13 @@ class GameMenu:
         self.stadium = pg.image.load("assets/stadiums/portugal.png").convert()
         self.stadium = pg.transform.scale(self.stadium, (WIDTH, HEIGHT))
 
+        self.ball = {
+                "sprite": Image("assets/ball/ball.png", (768, 100)),
+                "position": [768, 100],
+                "velocity": 0,
+                "falldown": True
+                }
+
         self.player = None
         self.opponent = None
 
@@ -61,13 +68,33 @@ class GameMenu:
             elif position < WIDTH:
                 self.players["player"]["position"] = position
             update_position(self, self.player.side_right)
+        
+        if self.ball["falldown"]:
+            if self.ball["position"][1] < 850:
+                self.ball["velocity"] += 0.5
+                self.ball["position"][1] += self.ball["velocity"]
+                move_ball(self)
+            else:
+                self.ball["falldown"] = False
+
+                pg.mixer.Sound("assets/sounds/ball_drop.mp3").play()
+            
+                self.ball["velocity"] += 0
+                self.ball["position"][1] = 850
 
     def draw(self):
         self.screen.blit(self.stadium, (0, 0))
     
+        self.ball["sprite"].draw(self.screen)
+
         self.players["player"]["sprite"].draw(self.screen)
         self.players["opponent"]["sprite"].draw(self.screen)
 
+
+def move_ball(self):
+    position = self.ball["position"]
+
+    self.ball["sprite"] = Image("assets/ball/ball.png", (position))
 
 def update_position(self, side_view):
     position = self.players["player"]["position"]
