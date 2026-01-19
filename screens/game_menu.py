@@ -40,11 +40,13 @@ class GameMenu:
             self.players = {
                     "player": {
                         "sprite": Image(self.player.side_right, (384, 800)),
-                        "position": 384   
+                        "position": [384, 800],
+                        "side": "right"
                         },
                     "opponent": {
                         "sprite": Image(self.opponent.side_left, (1152, 800)),
-                        "position": 1152
+                        "position": [1152, 800],
+                        "side": "left"
                         }
                     }
 
@@ -58,27 +60,50 @@ class GameMenu:
        # Movement the player
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
-            position = self.players["player"]["position"] - (self.player.speed * 0.1)
+            position = self.players["player"]["position"][0] - (self.player.speed * 0.1)
             if position <= 0:
-                self.players["player"]["position"] = 0
+                self.players["player"]["position"][0] = 0
             elif position > 0:
-                self.players["player"]["position"] = position
-            update_position(self, self.player.side_left)
+                self.players["player"]["position"][0] = position
+            
+            self.players["player"]["side"] = "left"
+            update_position(self)
+        
         if keys[pg.K_RIGHT]:
-            position = self.players["player"]["position"] + (self.player.speed * 0.1)
+            position = self.players["player"]["position"][0] + (self.player.speed * 0.1)
             if position >= WIDTH:
-                self.players["player"]["position"] = WIDTH
+                self.players["player"]["position"][0] = WIDTH
             elif position < WIDTH:
-                self.players["player"]["position"] = position
-            update_position(self, self.player.side_right)
-      
+                self.players["player"]["position"][0] = position
+            
+            self.players["player"]["side"] = "right"
+            update_position(self)
+        
+        # Jump if the Up arrow key is press and the player is on the ground
+        if keys[pg.K_UP] and self.players["player"]["position"][1] >= 800: 
+            self.players["player"]["position"][1] -= self.player.jump * 2 
+            update_position(self)
+        
+        if keys[pg.K_SPACE] and self.players["player"]["sprite"].rect.colliderect(self.ball["sprite"].rect):    
+            if self.players["player"]["side"] == "left":
+                self.ball["velocity"][0] = -abs(self.ball["velocity"][0]) * self.player.shot 
+                self.ball["position"][0] += self.ball["velocity"][0]
+            elif self.players["player"]["side"] == "right":
+                self.ball["velocity"][0] = abs(self.ball["velocity"][0]) * self.player.shot
+                self.ball["position"][0] += self.ball["velocity"][0]
+        
+        # If the player jump go to the ground
+        if self.players["player"]["position"][1] < 800:
+            self.players["player"]["position"][1] += 0.5
+            update_position(self)
+
         # References: https://stackoverflow.com/questions/62998806/how-to-make-a-bouncy-ball-in-pygame-python
         # Ball falling down with bouncy effect
         if self.ball["falldown"]:
             
             # Still falling
             if self.ball["position"][1] < 850:
-                self.ball["velocity"][1] += 0.2 # y value 
+                self.ball["velocity"][1] += 0.1 # y value 
                 self.ball["velocity"][0] = random.choice([self.ball["velocity"][0] + 0.02, self.ball["velocity"][0] - 0.02]) # Random select the x value (side where the ball will land)
 
                 self.ball["position"][1] += self.ball["velocity"][1]
@@ -103,14 +128,28 @@ class GameMenu:
 
                 move_ball(self)
         
-        # Left wall 
-        if self.ball["position"][0] <= 0:
-            self.ball["velocity"][0] = abs(self.ball["velocity"][0])
-        
-        # Right wall
-        if self.ball["position"][0] >= WIDTH:
-            self.ball["velocity"][0] = -abs(self.ball["velocity"][0])
 
+
+        if self.players["player"]["sprite"].rect.colliderect(self.ball["sprite"].rect):    
+            print("colide")
+            if self.players["player"]["side"] == "left":
+                self.ball["velocity"][0] = -abs(self.ball["velocity"][0]) 
+                self.ball["position"][0] += self.ball["velocity"][0]
+            elif self.players["player"]["side"] == "right":
+                self.ball["velocity"][0] = abs(self.ball["velocity"][0]) 
+                self.ball["position"][0] += self.ball["velocity"][0]
+
+            # Left wall 
+            if self.ball["position"][0] <= 0:
+                self.ball["position"][0] = 0
+            
+            # Right wall
+            if self.ball["position"][0] >= WIDTH:
+                self.ball["position"][0] = WIDTH
+
+
+            move_ball(self)
+            
 
     def draw(self):
         self.screen.blit(self.stadium, (0, 0))
@@ -126,10 +165,14 @@ def move_ball(self):
 
     self.ball["sprite"] = Image("assets/ball/ball.png", (position))
 
-def update_position(self, side_view):
+def update_position(self):
     position = self.players["player"]["position"]
-
+    
     # TODO: Still need to do position for the jump
-    self.players["player"]["sprite"] = Image(side_view, (position, 800))
+    if self.players["player"]["side"] == "left":
+        self.players["player"]["sprite"] = Image(self.player.side_left, (position))
+
+    elif self.players["player"]["side"] == "right":
+        self.players["player"]["sprite"] = Image(self.player.side_right, (position))
 
         
