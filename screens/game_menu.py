@@ -53,14 +53,14 @@ class GameMenu:
                 self.players["player"]["position"] = 0
             elif position > 0:
                 self.players["player"]["position"] = position
-            update_position(self)
+            update_position(self, self.player.side_left)
         if keys[pg.K_RIGHT]:
             position = self.players["player"]["position"] + (self.player.speed / 10)
             if position >= WIDTH:
                 self.players["player"]["position"] = WIDTH
             elif position < WIDTH:
                 self.players["player"]["position"] = position
-            update_position(self)
+            update_position(self, self.player.side_right)
 
     def draw(self):
         self.screen.blit(self.stadium, (0, 0))
@@ -69,10 +69,10 @@ class GameMenu:
         self.players["opponent"]["sprite"].draw(self.screen)
 
 
-def update_position(self):
+def update_position(self, side_view):
     position = self.players["player"]["position"]
 
     # TODO: Still need to do position for the jump
-    self.players["player"]["sprite"] = Image(self.player.side_right, (position, 800))
+    self.players["player"]["sprite"] = Image(side_view, (position, 800))
 
         
