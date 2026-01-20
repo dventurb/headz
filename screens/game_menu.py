@@ -96,16 +96,16 @@ def player_with_ball(arbiter, space, data):
     if data.player.kick_low:
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
         if data.player.side == "left":
-            data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, 0))
-        elif data.player.side == "right":
             data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, 0))
+        elif data.player.side == "right":
+            data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, 0))
         data.player.kick_low = False
     
     if data.player.kick_high:
         if data.player.side == "left":
-            data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, -300))
-        elif data.player.side == "right":
             data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, -300))
+        elif data.player.side == "right":
+            data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, -300))
         data.player.kick_high = False
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
 
