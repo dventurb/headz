@@ -23,21 +23,20 @@ class PlayerSelectMenu:
     
         # The next lines of code need a better aproach, I will definitely change this.
         players = [
-                Player("Bedas", "assets/characters/bedas/", 50, 30, 30),
-                Player("Lage", "assets/characters/lage/", 70, 50, 60),
-                Player("João David", "assets/characters/joaodavid/", 70, 60, 50)
+                Player("assets/characters/bedas/", 50, 30, 30),
+                Player("assets/characters/lage/", 70, 50, 60),
+                Player("assets/characters/joaodavid/", 70, 60, 50)
                 ]
 
         self.playerManager = PlayerManager()
         for player in players:
-            player.unlock = True
             self.playerManager.add_player(player)
 
         self.current_player_index = 0 
         
         self.character = {
                 "player": self.playerManager.players[self.current_player_index],
-                "font": Image(self.playerManager.players[self.current_player_index].font, (768, 200)), 
+                "font": Image(self.playerManager.players[self.current_player_index].name, (768, 200)), 
                 "sprite": Image(self.playerManager.players[self.current_player_index].front, (768, 512))
                 }
 
@@ -73,7 +72,7 @@ def click_button_left(self):
     self.current_player_index = (self.current_player_index - 1) % len(self.playerManager.players)
 
     self.character["player"] = self.playerManager.players[self.current_player_index]
-    self.character["font"] = Image(self.playerManager.players[self.current_player_index].font, (768, 200))
+    self.character["font"] = Image(self.playerManager.players[self.current_player_index].name, (768, 200))
     self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].front, (768, 512))
 
 
@@ -83,7 +82,7 @@ def click_button_right(self):
     self.current_player_index = (self.current_player_index + 1) % len(self.playerManager.players)
 
     self.character["player"] = self.playerManager.players[self.current_player_index]
-    self.character["font"] = Image(self.playerManager.players[self.current_player_index].font, (768, 200))
+    self.character["font"] = Image(self.playerManager.players[self.current_player_index].name, (768, 200))
     self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].front, (768, 512))
 
 
