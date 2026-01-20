@@ -56,6 +56,8 @@ class GameMenu:
         self.space.on_collision(2, 3, begin=ball_hits_pitch, data=self.ball)
         self.space.on_collision(1, 2, begin=player_with_ball, data=self)
         self.space.on_collision(1, 3, begin=player_on_pitch, data=self.player)
+        self.space.on_collision(2, 4, begin=npc_score_goal, data=self)
+        self.space.on_collision(2, 5, begin=player_score_goal, data=self)
         
         self.draw()
 
@@ -78,7 +80,7 @@ class GameMenu:
 
         # TODO: First do the goal score 
         if self.ball.body.position.y > HEIGHT:
-            self.ball.body.position = (self.ball.body.position.x, 100)
+            self.ball.body.position = (max(min(self.ball.body.position.x, (HEIGHT - 50)), 50), 100)
 
 
     def draw(self):
@@ -102,16 +104,16 @@ def player_with_ball(arbiter, space, data):
     if data.player.kick_low:
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
         if data.player.side == "left":
-            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, 0))
-        elif data.player.side == "right":
             data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, 0))
+        elif data.player.side == "right":
+            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, 0))
         data.player.kick_low = False
     
     if data.player.kick_high:
         if data.player.side == "left":
-            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, -300))
-        elif data.player.side == "right":
             data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, -300))
+        elif data.player.side == "right":
+            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, -300))
         data.player.kick_high = False
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
     return True
@@ -120,4 +122,14 @@ def player_with_ball(arbiter, space, data):
 def player_on_pitch(arbiter, space, data):
     data.on_pitch = True
     return True
+
+def npc_score_goal(arbiter, space, data):        
+    pg.mixer.Sound("assets/sounds/goal.mp3").play()
+    data.opponent.score += 1
+    return False
+
+def player_score_goal(arbiter, space, data):
+    pg.mixer.Sound("assets/sounds/goal.mp3").play()
+    data.player.score += 1
+    return False
 

@@ -21,6 +21,8 @@ class Player:
         self.shot = shot 
         self.jump = jump 
         self.speed = speed
+
+        self.score = 0
         
         vs = [(-70, -100), (70, -100), (70, 100), (-70, 100)]
         self.body = pm.Body(5, pm.moment_for_poly(5, vs))

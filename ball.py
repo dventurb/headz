@@ -6,7 +6,7 @@ from widgets import Image
 class Ball:
     def __init__(self, space, path : str, position):
         self.image = Image(path, position)
-        self.radius = self.image.image.get_width() // 2
+        self.radius = 32 // 2
 
         self.touch = False
 
