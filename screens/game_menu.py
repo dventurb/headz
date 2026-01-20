@@ -14,7 +14,7 @@ class GameMenu:
         self.gameStateManager = gameStateManager
         
         self.space = pm.Space()
-        self.space.gravity = 0, 1000
+        self.space.gravity = 0, 500
 
         self.ball = Ball(self.space, "assets/ball/ball.png", (768, 100))
         self.pitch = Pitch(self.space)
@@ -34,10 +34,12 @@ class GameMenu:
         if self.player is None or self.opponent is None:
             self.player = self.gameStateManager.selected_player
             self.player.image = Image(self.player.side_right, (384, 760))
+            self.player.side = "right"
             self.player.body.position = (384, 760)
 
             self.opponent = self.gameStateManager.opponent
             self.opponent.image = Image(self.opponent.side_left, (384, 760))
+            self.player.side = "left"
             self.opponent.body.position = (1152, 760)
             
             self.space.add(self.player.body, self.player.shape)
@@ -49,7 +51,9 @@ class GameMenu:
             self.play_music = True
         
         self.space.step(1/60)
+        
         self.space.on_collision(2, 3, begin=ball_hits_pitch, data=self.ball)
+        self.space.on_collision(1, 2, begin=player_with_ball, data=self)
         self.space.on_collision(1, 3, begin=player_on_pitch, data=self.player)
         
         self.draw()
@@ -58,13 +62,17 @@ class GameMenu:
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]: 
             self.player.update_sprite("left")
-            self.player.body.velocity = (-self.player.speed * 10, self.player.body.velocity.y)
+            self.player.body.velocity = (-self.player.speed * 5, self.player.body.velocity.y)
         if keys[pg.K_RIGHT]:
             self.player.update_sprite("right")
-            self.player.body.velocity = (self.player.speed * 10, self.player.body.velocity.y)
+            self.player.body.velocity = (self.player.speed * 5, self.player.body.velocity.y)
         if keys[pg.K_UP] and self.player.on_pitch:
             self.player.on_pitch = False
-            self.player.body.velocity = (self.player.body.velocity.x, -self.player.jump * 10)
+            self.player.body.velocity = (self.player.body.velocity.x, -self.player.jump * 10)    
+        if keys[pg.K_z]:
+            self.player.kick_low = True
+        if keys[pg.K_x]:
+            self.player.kick_high = True
 
 
     def draw(self):
@@ -80,10 +88,27 @@ class GameMenu:
 
 
 def ball_hits_pitch(arbiter, space, data):
-    pg.mixer.Sound("assets/sounds/ball_drop.mp3").play()
-    
+    pg.mixer.Sound("assets/sounds/ball_drop.mp3").play() 
     data.body.velocity = (random.choice([50, -50]), data.body.velocity.y)
     return True
+
+def player_with_ball(arbiter, space, data):
+    if data.player.kick_low:
+        pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
+        if data.player.side == "left":
+            data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, 0))
+        elif data.player.side == "right":
+            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, 0))
+        data.player.kick_low = False
+    
+    if data.player.kick_high:
+        if data.player.side == "left":
+            data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, -300))
+        elif data.player.side == "right":
+            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, -300))
+        data.player.kick_high = False
+        pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
+
 
 def player_on_pitch(arbiter, space, data):
     data.on_pitch = True

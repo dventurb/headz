@@ -12,7 +12,11 @@ class Player:
 
         self.image = None 
 
+        self.side = None
+
         self.on_pitch = True
+        self.kick_low = False
+        self.kick_high = False
 
         self.shot = shot 
         self.jump = jump 
@@ -22,7 +26,7 @@ class Player:
         self.body = pm.Body(5, pm.moment_for_poly(10, vs))
         
         self.shape = pm.Poly(self.body, vs)
-        self.shape.friction = 0.5
+        self.shape.friction = 1
         self.shape.collision_type = 1
 
     def draw(self, screen):
@@ -33,9 +37,11 @@ class Player:
 
     def update_sprite(self, side : str):
         if side == "left":
+            self.side = "left"
             self.image = Image(self.side_left, (self.body.position))
 
         elif side == "right":
+            self.side = "right"
             self.image = Image(self.side_right, (self.body.position))
 
 class PlayerManager:
