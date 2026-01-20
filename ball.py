@@ -6,7 +6,7 @@ from widgets import Image
 class Ball:
     def __init__(self, space, path : str, position):
         self.image = Image(path, position)
-        self.radius = self.image.image.get_width() / 2
+        self.radius = self.image.image.get_width() // 2
 
         self.touch = False
 
@@ -14,8 +14,8 @@ class Ball:
         self.body.position = position
 
         self.shape = pm.Circle(self.body, self.radius)
-        self.shape.elasticity = 0.5
-        self.shape.friction = 1
+        self.shape.elasticity = 0.4
+        self.shape.friction = 0.2
         self.shape.collision_type = 2
 
         space.add(self.body, self.shape) 

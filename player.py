@@ -22,11 +22,11 @@ class Player:
         self.jump = jump 
         self.speed = speed
         
-        vs = [(-75, -112), (75, -112), (75, 112), (-75, 112)]
-        self.body = pm.Body(5, pm.moment_for_poly(10, vs))
+        vs = [(-70, -100), (70, -100), (70, 100), (-70, 100)]
+        self.body = pm.Body(5, pm.moment_for_poly(5, vs))
         
         self.shape = pm.Poly(self.body, vs)
-        self.shape.friction = 1
+        self.shape.friction = 0.2
         self.shape.collision_type = 1
 
     def draw(self, screen):

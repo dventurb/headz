@@ -9,12 +9,16 @@ class Pitch:
         self.pitch = pm.Segment(self.body, (0, 860), (WIDTH, 860), 1)
         
         self.left_wall = pm.Segment(self.body, (0, 0), (0, HEIGHT), 1)
-        self.right_wall = pm.Segment(self.body, (WIDTH, 0), (WIDTH, HEIGHT), 1)
+        self.right_wall = pm.Segment(self.body, (WIDTH, 0), (WIDTH, HEIGHT), 10)
+
+        self.pitch.friction = 0.6
+        self.pitch.elasticity = 0.2
+        self.pitch.collision_type = 3
        
-        for i in (self.pitch, self.left_wall, self.right_wall):
-            i.friction = 1.0
+        for i in (self.left_wall, self.right_wall):
+            i.friction = 0
             i.elasticity = 0.8
-            i.collision_type = 3
+            i.collision_type = 4
 
         space.add(self.body, self.pitch, self.left_wall, self.right_wall) # Static bodies don't add the body to the space
 

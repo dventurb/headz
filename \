@@ -41,7 +41,6 @@ class GameMenu:
             self.opponent.image = Image(self.opponent.side_left, (384, 760))
             self.player.side = "left"
             self.opponent.body.position = (1152, 760)
-            self.opponent.collision_type = 0
             
             self.space.add(self.player.body, self.player.shape)
             self.space.add(self.opponent.body, self.opponent.shape)
@@ -68,7 +67,6 @@ class GameMenu:
             self.player.update_sprite("right")
             self.player.body.velocity = (self.player.speed * 5, self.player.body.velocity.y)
         if keys[pg.K_UP] and self.player.on_pitch:
-            pg.mixer.Sound("assets/sounds/jump.mp3").play() 
             self.player.on_pitch = False
             self.player.body.velocity = (self.player.body.velocity.x, -self.player.jump * 10)    
         if keys[pg.K_z]:
@@ -76,9 +74,8 @@ class GameMenu:
         if keys[pg.K_x]:
             self.player.kick_high = True
 
-        # TODO: First do the goal score 
         if self.ball.body.position.y > HEIGHT:
-            self.ball.body.position = (self.ball.body.position.x, 100)
+            self.ball.body.position = (768, 100)
 
 
     def draw(self):
