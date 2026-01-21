@@ -27,6 +27,8 @@ class GameMenu:
         self.opponent = None
 
         self.players = {}
+
+        self.player_with_ball = None
  
         self.play_music = False
 
@@ -73,10 +75,29 @@ class GameMenu:
             pg.mixer.Sound("assets/sounds/jump.mp3").play() 
             self.player.on_pitch = False
             self.player.body.velocity = (self.player.body.velocity.x, -self.player.jump * 10)    
-        if keys[pg.K_z]:
-            self.player.kick_low = True
-        if keys[pg.K_x]:
-            self.player.kick_high = True
+    
+        # Check when z, x, c keys was pressed (KEYDOWN) and released (KEYUP)
+        for event in events:
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_z:
+                    self.player.kick_low = True
+                if event.key == pg.K_x:
+                    self.player.kick_high = True
+                if event.key == pg.K_c:
+                    self.player.pick_ball = True
+            if event.type == pg.KEYUP:
+                if event.key == pg.K_z:
+                    self.player.kick_low = False
+                if event.key == pg.K_x:
+                    self.player.kick_high = False
+                if event.key == pg.K_c:
+                    self.player.pick_ball = False
+        
+        # Remove the anchor point from ball and player 
+        if not self.player.pick_ball and self.player_with_ball is not None:
+            self.space.remove(self.player_with_ball)
+            self.player_with_ball = None
+
 
         # TODO: First do the goal score 
         if self.ball.body.position.y > HEIGHT:
@@ -102,20 +123,40 @@ def ball_hits_pitch(arbiter, space, data):
 
 def player_with_ball(arbiter, space, data):
     if data.player.kick_low:
-        pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
+        if data.player.pick_ball and data.player_with_ball is not None:
+            data.space.remove(data.player_with_ball)
+            data.player_with_ball = None
+            data.player.pick_ball = False
+       
         if data.player.side == "left":
             data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, 0))
+        
         elif data.player.side == "right":
             data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, 0))
-        data.player.kick_low = False
+        
+        pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
     
-    if data.player.kick_high:
+    elif data.player.kick_high:
+        if data.player.pick_ball and data.player_with_ball is not None:
+            data.space.remove(data.player_with_ball)
+            data.player_with_ball = None
+            data.player.pick_ball = False
+
         if data.player.side == "left":
             data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, -300))
+        
         elif data.player.side == "right":
-            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, -300))
-        data.player.kick_high = False
+            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, -300))             
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
+
+    elif data.player.pick_ball and data.player_with_ball is None:
+        if data.player.side == "left":
+            data.player_with_ball = pm.constraints.PinJoint(data.player.body, data.ball.body, (0, 0), (0, 0))
+        
+        elif data.player.side == "right":
+            data.player_with_ball = pm.constraints.PinJoint(data.player.body, data.ball.body, (0, 0), (0, 0))
+        data.space.add(data.player_with_ball)
+
     return True
 
 

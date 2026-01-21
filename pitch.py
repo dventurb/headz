@@ -12,7 +12,7 @@ class Pitch:
         self.right_wall = pm.Segment(self.body, (WIDTH, 0), (WIDTH, HEIGHT), 1)
 
         self.pitch.friction = 0.6
-        self.pitch.elasticity = 0.2
+        self.pitch.elasticity = 0.5
         self.pitch.collision_type = 3
        
         for i in (self.left_wall, self.right_wall):

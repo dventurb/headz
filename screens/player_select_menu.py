@@ -25,7 +25,8 @@ class PlayerSelectMenu:
         players = [
                 Player("assets/characters/bedas/", 50, 30, 30),
                 Player("assets/characters/lage/", 70, 50, 60),
-                Player("assets/characters/joaodavid/", 70, 60, 50)
+                Player("assets/characters/joaodavid/", 70, 60, 50),
+                Player("assets/characters/valonga/", 80, 30, 30)
                 ]
 
         self.playerManager = PlayerManager()

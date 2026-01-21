@@ -17,6 +17,7 @@ class Player:
         self.on_pitch = True
         self.kick_low = False
         self.kick_high = False
+        self.pick_ball = False
 
         self.shot = shot 
         self.jump = jump 
