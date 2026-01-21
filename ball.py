@@ -1,12 +1,13 @@
 import pygame as pg 
 import pymunk as pm
+import random
 
 from widgets import Image
 
 class Ball:
     def __init__(self, space, path : str, position):
         self.image = Image(path, position)
-        self.radius = 32 // 2
+        self.radius = 16 # by eye
 
         self.touch = False
 
@@ -26,4 +27,7 @@ class Ball:
     def update(self):
         self.image.rect.center = self.body.position
 
+    def update_sprite(self, num : int):
+        path = f"assets/ball/ball_{num}.png"
+        self.image = Image(path, (self.body.position))
 
