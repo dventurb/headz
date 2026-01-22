@@ -23,6 +23,11 @@ class GameMenu:
         self.stadium = pg.image.load("assets/stadiums/portugal.png").convert()
         self.stadium = pg.transform.scale(self.stadium, (WIDTH, HEIGHT))
 
+        self.display_score = Image("assets/display.png", (768, 100))
+
+        self.timer, self.text = 90, "90".rjust(3)
+        self.timer_event = pg.time.set_timer(pg.USEREVENT, 1000)
+
         self.player = None
         self.opponent = None
 
@@ -52,7 +57,10 @@ class GameMenu:
             pg.mixer.music.load("assets/sounds/portugal.mp3")
             pg.mixer.music.play(-1)
             self.play_music = True
-        
+       
+
+        self.font = pg.font.Font("assets/fonts/Bangers.ttf", 100)
+
         self.space.step(1/60)
         
         self.space.on_collision(2, 3, begin=ball_hits_pitch, data=self.ball)
@@ -77,8 +85,8 @@ class GameMenu:
             self.player.body.velocity = (self.player.body.velocity.x, -self.player.jump * 10)    
    
 
-        # Check when z, x, c keys was pressed (KEYDOWN) and released (KEYUP)
         for event in events:
+            # Check when z, x, c keys was pressed (KEYDOWN) and released (KEYUP)
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_z:
                     self.player.kick_low = True
@@ -93,7 +101,20 @@ class GameMenu:
                     self.player.kick_high = False
                 if event.key == pg.K_c:
                     self.press_c = False
+                    self.player.kick_low = False
+                if event.key == pg.K_x:
+                    self.player.kick_high = False
+                if event.key == pg.K_c:
+                    self.press_c = False
                     self.player.has_ball = False
+            # Countdown timer
+            # References: https://stackoverflow.com/questions/30720665/countdown-timer-in-pygame
+            if event.type == pg.USEREVENT:
+                self.timer -= 1
+                if self.timer > 0:
+                    self.text = str(self.timer).rjust(3)
+                    print(self.text)
+                #else:
         
 
        # Player have the ball and presse z or x for shoting 
@@ -160,6 +181,10 @@ class GameMenu:
             self.ball.update()
             self.ball.draw(self.screen)
 
+        self.display_score.draw(self.screen)
+
+        self.screen.blit(self.font.render(self.text, True, (255, 255, 255)), (700, 40))
+
         self.player.update()
         self.player.draw(self.screen)
         self.opponent.update()
@@ -172,7 +197,6 @@ def ball_hits_pitch(arbiter, space, data):
     pg.mixer.Sound("assets/sounds/ball_drop.mp3").play() 
     #data.body.velocity = (random.choice([100, -100]), data.body.velocity.y)
     return True
-   
 
 # Callback collision between player and the ball
 # Used to detect if the user press z, x, c keys when the player touches the ball.
