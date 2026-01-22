@@ -24,10 +24,11 @@ class PlayerSelectMenu:
         # The next lines of code need a better aproach, I will definitely change this.
         # Player(path : str, shot : int, jump : int, speed : int)
         players = [
-                Player("assets/characters/bedas/", 40, 30, 30),
+                Player("assets/characters/bedas/", 40, 40, 40),
                 Player("assets/characters/lage/", 60, 50, 50),
-                Player("assets/characters/joaodavid/", 60, 60, 40),
-                Player("assets/characters/valonga/", 70, 30, 30)
+                Player("assets/characters/joaodavid/", 60, 55, 50),
+                Player("assets/characters/valonga/", 70, 30, 30),
+                Player("assets/characters/brito/", 50, 40, 40)
                 ]
 
         self.playerManager = PlayerManager()

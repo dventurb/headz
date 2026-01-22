@@ -41,7 +41,7 @@ class GameMenu:
 
             self.opponent = self.gameStateManager.opponent
             self.opponent.image = Image(self.opponent.side_left, (384, 760))
-            self.player.side = "left"
+            self.opponent.side = "left"
             self.opponent.body.position = (1152, 760)
             self.opponent.collision_type = 0
             
@@ -93,29 +93,37 @@ class GameMenu:
                     self.player.kick_high = False
                 if event.key == pg.K_c:
                     self.press_c = False
-                    self.player.pick_ball = False
+                    self.player.has_ball = False
         
 
        # Player have the ball and presse z or x for shoting 
-        if self.player.pick_ball:
+        if self.player.has_ball:
             if self.player.kick_high:
                 if not self.ball.body_in_space():
                     self.space.add(self.ball.body, self.ball.shape)
                 if self.player.side == "left":
-                    self.ball.body.apply_impulse_at_local_point((self.player.shot * 10, -200))
+                    self.ball.body.position = self.player.body.position - (40, 0)
+                    self.ball.body.apply_impulse_at_world_point((-self.player.shot * 5, -300), self.ball.body.position)
                 elif self.player.side == "right":
-                    self.ball.body.apply_impulse_at_local_point((-self.player.shot * 10, -200))             
+                    self.ball.body.position = self.player.body.position + (40, 0)
+                    self.ball.body.apply_impulse_at_world_point((self.player.shot * 5, -300), self.ball.body.position)             
                 pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
-                self.player.pick_ball = False
-            if self.player.kick_low:
+                self.player.has_ball = False
+                self.press_c = False
+                self.player.kick_high = False
+            elif self.player.kick_low:
                 if not self.ball.body_in_space():
                     self.space.add(self.ball.body, self.ball.shape)
                 if self.player.side == "left":
-                    self.ball.body.apply_impulse_at_local_point((self.player.shot * 10, 0))
+                    self.ball.body.position = self.player.body.position - (40, 0)
+                    self.ball.body.apply_impulse_at_world_point((-self.player.shot * 10, 0), self.ball.body.position)
                 elif self.player.side == "right":
-                    self.ball.body.apply_impulse_at_local_point((-self.player.shot * 10, 0))             
+                    self.ball.body.position = self.player.body.position + (40, 0)
+                    self.ball.body.apply_impulse_at_world_point((self.player.shot * 10, 0), self.ball.body.position)             
                 pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
-                self.player.pick_ball = False 
+                self.player.has_ball = False 
+                self.press_c = False
+                self.player.kick_low = False
 
 
         # TODO: First do the goal score 
@@ -125,20 +133,22 @@ class GameMenu:
         
 
         # Update the image of the ball when player has the ball
-        if self.player.pick_ball:
+        if self.player.has_ball:
             if self.player.side == "left":
-                self.ball.image.rect.center = (self.player.body.position.x - 50, self.ball.body.position.y)
+                self.ball.image.rect.center = (self.player.body.position.x - 80, self.player.image.rect.bottom - 20)
             elif self.player.side == "right":
-                self.ball.image.rect.center = (self.player.body.position.x + 50, self.ball.body.position.y)
+                self.ball.image.rect.center = (self.player.body.position.x + 80, self.player.image.rect.bottom - 20)
             self.ball.draw(self.screen)
 
-        
-        if not self.ball.body_in_space():
+
+        # Player drops the ball, add ball body and shape back to space
+        if not self.ball.body_in_space() and not self.player.has_ball:
             if self.player.side == "left":
-                self.ball.body.position = (self.player.body.position.x - 50, self.ball.body.position.y)
+                self.ball.body.position = (self.player.body.position.x - 80, self.player.body.position.y)
             elif self.player.side == "right":
-                self.ball.body.position = (self.player.body.position.x + 50, self.ball.body.position.y)
+                self.ball.body.position = (self.player.body.position.x + 80, self.player.body.position.y)
             self.space.add(self.ball.body, self.ball.shape)
+
 
     def draw(self):
         self.screen.blit(self.stadium, (0, 0))
@@ -146,61 +156,69 @@ class GameMenu:
         # Ball movement effect
         self.ball.update_sprite(int((self.ball.body.velocity.length % 4) + 1))
         
-        if not self.player.pick_ball:
+        if not self.player.has_ball:
             self.ball.update()
             self.ball.draw(self.screen)
+
         self.player.update()
         self.player.draw(self.screen)
         self.opponent.update()
         self.opponent.draw(self.screen)
 
 
+# Callback for collision between the ball and the pitch
+# Used to play sound of the ball hits the ground.
 def ball_hits_pitch(arbiter, space, data):
     pg.mixer.Sound("assets/sounds/ball_drop.mp3").play() 
     #data.body.velocity = (random.choice([100, -100]), data.body.velocity.y)
     return True
+   
 
+# Callback collision between player and the ball
+# Used to detect if the user press z, x, c keys when the player touches the ball.
 def player_with_ball(arbiter, space, data):
     if data.player.kick_low:
-        if data.player.pick_ball:
-            data.player.pick_ball = False
-       
         if data.player.side == "left":
-            data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, 0))
-     
+            data.ball.body.position = data.player.body.position - (40, 0)
+            data.ball.body.apply_impulse_at_world_point((-data.player.shot * 10, 0), data.ball.body.position)
         elif data.player.side == "right":
-            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, 0))
-        
+            data.ball.body.position = data.player.body.position + (40, 0)
+            data.ball.body.apply_impulse_at_world_point((data.player.shot * 10, 0), data.ball.body.position)         
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
     
     if data.player.kick_high:
-        if data.player.pick_ball:
-            data.player.pick_ball = False
-
         if data.player.side == "left":
-            data.ball.body.apply_impulse_at_local_point((data.player.shot * 10, -200))
-        
+            data.ball.body.position = data.player.body.position - (40, 0)
+            data.ball.body.apply_impulse_at_world_point((-data.player.shot * 5, -300), self.ball.body.position)
         elif data.player.side == "right":
-            data.ball.body.apply_impulse_at_local_point((-data.player.shot * 10, -200))             
+            data.ball.body.position = data.player.body.position + (40, 0)
+            data.ball.body.apply_impulse_at_world_point((data.player.shot * 5, -300), data.ball.body.position)    
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
 
     if data.press_c:
-        data.player.pick_ball = True
-        data.new_position = False
+        data.player.has_ball = True
         data.space.remove(data.ball.body, data.ball.shape)
 
     return True
 
 
+# Callback collision between player and the pitch
+# If the player is not on the ground, cannot jump.
 def player_on_pitch(arbiter, space, data):
     data.on_pitch = True
     return True
 
+
+# Callback collision ball with left wall 
+# Ball hits the left wall, goal from the npc.
 def npc_score_goal(arbiter, space, data):        
     pg.mixer.Sound("assets/sounds/goal.mp3").play()
     data.opponent.score += 1
     return False
 
+
+# Callback collision ball with right wall
+# Ball hits the right wall, goal from the player.
 def player_score_goal(arbiter, space, data):
     pg.mixer.Sound("assets/sounds/goal.mp3").play()
     data.player.score += 1
