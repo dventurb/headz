@@ -31,3 +31,9 @@ class Ball:
         path = f"assets/ball/ball_{num}.png"
         self.image = Image(path, (self.body.position))
 
+    def body_in_space(self):
+        if any(self.shape.space is not None for shape in self.body.shapes):
+            return True
+        else:
+            return False
+
