@@ -4,9 +4,11 @@ import pymunk as pm
 from widgets import Image
 
 class Player:
-    def __init__(self, path: str, shot: int, jump: int, speed: int):
+    def __init__(self, name : str, path: str, shot: int, jump: int, speed: int):
+        self.name = name 
+
         self.front = f"{path}front.png"
-        self.name =  f"{path}name.png"
+        self.font =  f"{path}name.png"
         self.side_right = f"{path}side_right.png"
         self.side_left = f"{path}side_left.png"
 

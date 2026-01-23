@@ -24,6 +24,12 @@ class GameMenu:
         self.stadium = pg.transform.scale(self.stadium, (WIDTH, HEIGHT))
 
         self.display_score = Image("assets/display.png", (768, 100))
+        
+        # Sprites of each character have different sizes, so these values are used to center each one on the scoreboard. First dict represents the front sprite and the second represents the name img.
+        self.display_offset = [
+                    { "Bedas": 0, "Lage": -8, "João David": 10, "Valonga": -5, "Brito": -2},
+                    { "Bedas": 0, "Lage": 0, "João David": 25, "Valonga": 65, "Brito": 10}
+                ]
 
         self.timer = 90
         self.timer_event = pg.time.set_timer(pg.USEREVENT, 1000)
@@ -43,21 +49,32 @@ class GameMenu:
             self.player.image = Image(self.player.side_right, (384, 760))
             self.player.side = "right"
             self.player.body.position = (384, 760)        
-            self.player_sprite = Image(self.player.front, (625, 250))
+
+            self.player_sprite = Image(self.player.front, (self.display_score.rect.left + 215, self.display_score.rect.top + 290 + self.display_offset[0][self.player.name]))
             w, h = self.player_sprite.image.get_size()
-            self.player_sprite.image = pg.transform.smoothscale(self.player_sprite.image, (w * 0.30, h * 0.30))
+            self.player_sprite.image = pg.transform.smoothscale(self.player_sprite.image, (w * 0.29, h * 0.29))
+
+            self.player_name = Image(self.player.font, (self.display_score.rect.left + 290 + self.display_offset[1][self.player.name], self.display_score.rect.top + 298))
+            w, h = self.player_name.image.get_size()
+            self.player_name.image = pg.transform.smoothscale(self.player_name.image, (w * 0.20, h * 0.20))
 
             self.opponent = self.gameStateManager.opponent
             self.opponent.image = Image(self.opponent.side_left, (384, 760))
             self.opponent.side = "left"
             self.opponent.body.position = (1152, 760)
-            self.opponent_sprite = Image(self.opponent.front, (1115, 250))
-            w, h = self.opponent_sprite.image.get_size()
-            self.opponent_sprite.image = pg.transform.smoothscale(self.opponent_sprite.image, (w * 0.30, h * 0.30))
             self.opponent.collision_type = 0
+
+            self.opponent_sprite = Image(self.opponent.front, (self.display_score.rect.right - 5, self.display_score.rect.top + 290 + self.display_offset[0][self.opponent.name]))
+            w, h = self.opponent_sprite.image.get_size()
+            self.opponent_sprite.image = pg.transform.smoothscale(self.opponent_sprite.image, (w * 0.29, h * 0.29))
             
+            self.opponent_name = Image(self.opponent.font, (self.display_score.rect.right + 65 + self.display_offset[1][self.opponent.name], self.display_score.rect.top + 298))
+            w, h = self.opponent_name.image.get_size()
+            self.opponent_name.image = pg.transform.smoothscale(self.opponent_name.image, (w * 0.20, h * 0.20))
+
             self.space.add(self.player.body, self.player.shape)
             self.space.add(self.opponent.body, self.opponent.shape)
+
 
         if not self.play_music:
             pg.mixer.music.load("assets/sounds/portugal.mp3")
@@ -187,13 +204,15 @@ class GameMenu:
 
         self.player_sprite.draw(self.screen)
         self.opponent_sprite.draw(self.screen)
+        self.player_name.draw(self.screen)
+        self.opponent_name.draw(self.screen)
 
-        font = pg.font.Font("assets/fonts/Bangers.ttf", 100)
-        self.screen.blit(font.render(str(self.timer).rjust(3), True, (255, 255, 255)), (700, 40))
+        font = pg.font.Font("assets/fonts/shineseiya.ttf", 140)
+        self.screen.blit(font.render(str(self.timer).rjust(3), True, (255, 255, 255)), (690, 20))
         
-        font = pg.font.Font("assets/fonts/Bangers.ttf", 70)
-        self.screen.blit(font.render(str(self.player.score).rjust(3), True, (255, 255, 255)), (600, 60))
-        self.screen.blit(font.render(str(self.opponent.score).rjust(3), True, (255, 255, 255)), (850, 60))
+        font = pg.font.Font("assets/fonts/shineseiya.ttf", 80)
+        self.screen.blit(font.render(str(self.player.score).rjust(3), True, (255, 255, 255)), (600, 80))
+        self.screen.blit(font.render(str(self.opponent.score).rjust(3), True, (255, 255, 255)), (840, 80))
 
         self.player.update()
         self.player.draw(self.screen)
@@ -207,6 +226,7 @@ def ball_hits_pitch(arbiter, space, data):
     pg.mixer.Sound("assets/sounds/ball_drop.mp3").play() 
     #data.body.velocity = (random.choice([100, -100]), data.body.velocity.y)
     return True
+
 
 # Callback collision between player and the ball
 # Used to detect if the user press z, x, c keys when the player touches the ball.
@@ -223,7 +243,7 @@ def player_with_ball(arbiter, space, data):
     if data.player.kick_high:
         if data.player.side == "left":
             data.ball.body.position = data.player.body.position - (40, 0)
-            data.ball.body.apply_impulse_at_world_point((-data.player.shot * 5, -300), self.ball.body.position)
+            data.ball.body.apply_impulse_at_world_point((-data.player.shot * 5, -300), data.ball.body.position)
         elif data.player.side == "right":
             data.ball.body.position = data.player.body.position + (40, 0)
             data.ball.body.apply_impulse_at_world_point((data.player.shot * 5, -300), data.ball.body.position)    

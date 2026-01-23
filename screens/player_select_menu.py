@@ -24,11 +24,11 @@ class PlayerSelectMenu:
         # The next lines of code need a better aproach, I will definitely change this.
         # Player(path : str, shot : int, jump : int, speed : int)
         players = [
-                Player("assets/characters/bedas/", 40, 40, 40),
-                Player("assets/characters/lage/", 60, 50, 50),
-                Player("assets/characters/joaodavid/", 60, 55, 50),
-                Player("assets/characters/valonga/", 70, 30, 30),
-                Player("assets/characters/brito/", 50, 40, 40)
+                Player("Bedas", "assets/characters/bedas/", 40, 40, 40),
+                Player("Lage", "assets/characters/lage/", 60, 50, 50),
+                Player("João David", "assets/characters/joaodavid/", 60, 55, 50),
+                Player("Valonga", "assets/characters/valonga/", 70, 30, 30),
+                Player("Brito", "assets/characters/brito/", 50, 40, 40)
                 ]
 
         self.playerManager = PlayerManager()
@@ -39,7 +39,7 @@ class PlayerSelectMenu:
         
         self.character = {
                 "player": self.playerManager.players[self.current_player_index],
-                "font": Image(self.playerManager.players[self.current_player_index].name, (768, 200)), 
+                "font": Image(self.playerManager.players[self.current_player_index].font, (768, 200)), 
                 "sprite": Image(self.playerManager.players[self.current_player_index].front, (768, 512))
                 }
 
@@ -75,7 +75,7 @@ def click_button_left(self):
     self.current_player_index = (self.current_player_index - 1) % len(self.playerManager.players)
 
     self.character["player"] = self.playerManager.players[self.current_player_index]
-    self.character["font"] = Image(self.playerManager.players[self.current_player_index].name, (768, 200))
+    self.character["font"] = Image(self.playerManager.players[self.current_player_index].font, (768, 200))
     self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].front, (768, 512))
 
 
@@ -85,7 +85,7 @@ def click_button_right(self):
     self.current_player_index = (self.current_player_index + 1) % len(self.playerManager.players)
 
     self.character["player"] = self.playerManager.players[self.current_player_index]
-    self.character["font"] = Image(self.playerManager.players[self.current_player_index].name, (768, 200))
+    self.character["font"] = Image(self.playerManager.players[self.current_player_index].font, (768, 200))
     self.character["sprite"] = Image(self.playerManager.players[self.current_player_index].front, (768, 512))
 
 
