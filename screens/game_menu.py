@@ -25,7 +25,7 @@ class GameMenu:
 
         self.display_score = Image("assets/display.png", (768, 100))
 
-        self.timer, self.text = 90, "90".rjust(3)
+        self.timer = 90
         self.timer_event = pg.time.set_timer(pg.USEREVENT, 1000)
 
         self.player = None
@@ -42,12 +42,18 @@ class GameMenu:
             self.player = self.gameStateManager.selected_player
             self.player.image = Image(self.player.side_right, (384, 760))
             self.player.side = "right"
-            self.player.body.position = (384, 760)
+            self.player.body.position = (384, 760)        
+            self.player_sprite = Image(self.player.front, (625, 250))
+            w, h = self.player_sprite.image.get_size()
+            self.player_sprite.image = pg.transform.smoothscale(self.player_sprite.image, (w * 0.30, h * 0.30))
 
             self.opponent = self.gameStateManager.opponent
             self.opponent.image = Image(self.opponent.side_left, (384, 760))
             self.opponent.side = "left"
             self.opponent.body.position = (1152, 760)
+            self.opponent_sprite = Image(self.opponent.front, (1115, 250))
+            w, h = self.opponent_sprite.image.get_size()
+            self.opponent_sprite.image = pg.transform.smoothscale(self.opponent_sprite.image, (w * 0.30, h * 0.30))
             self.opponent.collision_type = 0
             
             self.space.add(self.player.body, self.player.shape)
@@ -58,8 +64,6 @@ class GameMenu:
             pg.mixer.music.play(-1)
             self.play_music = True
        
-
-        self.font = pg.font.Font("assets/fonts/Bangers.ttf", 100)
 
         self.space.step(1/60)
         
@@ -110,10 +114,8 @@ class GameMenu:
             # Countdown timer
             # References: https://stackoverflow.com/questions/30720665/countdown-timer-in-pygame
             if event.type == pg.USEREVENT:
-                self.timer -= 1
                 if self.timer > 0:
-                    self.text = str(self.timer).rjust(3)
-                    print(self.text)
+                    self.timer -= 1
                 #else:
         
 
@@ -183,7 +185,15 @@ class GameMenu:
 
         self.display_score.draw(self.screen)
 
-        self.screen.blit(self.font.render(self.text, True, (255, 255, 255)), (700, 40))
+        self.player_sprite.draw(self.screen)
+        self.opponent_sprite.draw(self.screen)
+
+        font = pg.font.Font("assets/fonts/Bangers.ttf", 100)
+        self.screen.blit(font.render(str(self.timer).rjust(3), True, (255, 255, 255)), (700, 40))
+        
+        font = pg.font.Font("assets/fonts/Bangers.ttf", 70)
+        self.screen.blit(font.render(str(self.player.score).rjust(3), True, (255, 255, 255)), (600, 60))
+        self.screen.blit(font.render(str(self.opponent.score).rjust(3), True, (255, 255, 255)), (850, 60))
 
         self.player.update()
         self.player.draw(self.screen)
