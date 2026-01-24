@@ -1,3 +1,5 @@
 # config.py 
 
 WIDTH, HEIGHT = 1536, 1024
+
+GRAVITY = 900

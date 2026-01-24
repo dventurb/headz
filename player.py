@@ -17,8 +17,10 @@ class Player:
         self.side = None
 
         self.on_pitch = True
+        
         self.kick_low = False
         self.kick_high = False
+        self.lift_ball = False
         
         self.has_ball = False
 

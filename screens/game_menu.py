@@ -2,7 +2,7 @@ import pygame as pg
 import pymunk as pm 
 import random 
 
-from config import WIDTH, HEIGHT
+from config import WIDTH, HEIGHT, GRAVITY
 from widgets import Image
 from ball import Ball
 from pitch import Pitch
@@ -14,7 +14,7 @@ class GameMenu:
         self.gameStateManager = gameStateManager
         
         self.space = pm.Space()
-        self.space.gravity = 0, 900
+        self.space.gravity = 0, GRAVITY
 
         self.ball = Ball(self.space, "assets/ball/ball_1.png", (768, 100))
         self.pitch = Pitch(self.space)
@@ -113,6 +113,8 @@ class GameMenu:
                     self.player.kick_low = True
                 if event.key == pg.K_x:
                     self.player.kick_high = True
+                if event.key == pg.K_a:
+                    self.player.lift_ball = True
                 if event.key == pg.K_c:
                     self.press_c = True
             if event.type == pg.KEYUP:
@@ -120,6 +122,8 @@ class GameMenu:
                     self.player.kick_low = False
                 if event.key == pg.K_x:
                     self.player.kick_high = False
+                if event.key == pg.K_a:
+                    self.player.lift_ball = False
                 if event.key == pg.K_c:
                     self.press_c = False
                     self.player.kick_low = False
@@ -164,6 +168,19 @@ class GameMenu:
                 self.player.has_ball = False 
                 self.press_c = False
                 self.player.kick_low = False
+            elif self.player.lift_ball:
+                if not self.ball.body_in_space():
+                    self.space.add(self.ball.body, self.ball.shape)
+                if self.player.side == "left":
+                    self.ball.body.position = self.player.body.position - (40, 150)
+                    self.ball.body.apply_impulse_at_world_point((-20, -self.player.shot), self.ball.body.position)    
+                elif self.player.side == "right":
+                    self.ball.body.position = self.player.body.position + (40, -150)
+                    self.ball.body.apply_impulse_at_world_point((20, -self.player.shot), self.ball.body.position)    
+                pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
+                self.player.has_ball = False 
+                self.press_c = False
+                self.player.lift_ball = False
 
 
         # TODO: First do the goal score 
@@ -240,7 +257,7 @@ def player_with_ball(arbiter, space, data):
             data.ball.body.apply_impulse_at_world_point((data.player.shot * 10, 0), data.ball.body.position)         
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
     
-    if data.player.kick_high:
+    elif data.player.kick_high:
         if data.player.side == "left":
             data.ball.body.position = data.player.body.position - (40, 0)
             data.ball.body.apply_impulse_at_world_point((-data.player.shot * 5, -300), data.ball.body.position)
@@ -249,7 +266,16 @@ def player_with_ball(arbiter, space, data):
             data.ball.body.apply_impulse_at_world_point((data.player.shot * 5, -300), data.ball.body.position)    
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
 
-    if data.press_c:
+    elif data.player.lift_ball:
+        if data.player.side == "left":
+            data.ball.body.position = data.player.body.position - (40, 150)
+            data.ball.body.apply_impulse_at_world_point((-20, -data.player.shot), data.ball.body.position)    
+        elif data.player.side == "right":
+            data.ball.body.position = data.player.body.position + (40, -150)
+            data.ball.body.apply_impulse_at_world_point((20, -data.player.shot), data.ball.body.position)  
+        pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
+
+    elif data.press_c:
         data.player.has_ball = True
         data.space.remove(data.ball.body, data.ball.shape)
 
