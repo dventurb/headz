@@ -6,6 +6,7 @@ from config import WIDTH, HEIGHT, GRAVITY
 from widgets import Image
 from ball import Ball
 from pitch import Pitch
+from utility_ai import UtilityAI
 
 class GameMenu:
     def __init__(self, screen, clock, gameStateManager):
@@ -35,7 +36,9 @@ class GameMenu:
         self.timer_event = pg.time.set_timer(pg.USEREVENT, 1000)
 
         self.player = None
-        self.opponent = None
+        self.npc = None
+
+        self.utility_ai = UtilityAI()
 
         self.players = {}
 
@@ -44,7 +47,7 @@ class GameMenu:
         self.play_music = False
 
     def run(self, events):
-        if self.player is None or self.opponent is None:
+        if self.player is None or self.npc is None:
             self.player = self.gameStateManager.selected_player
             self.player.image = Image(self.player.side_right, (384, 760))
             self.player.side = "right"
@@ -58,22 +61,22 @@ class GameMenu:
             w, h = self.player_name.image.get_size()
             self.player_name.image = pg.transform.smoothscale(self.player_name.image, (w * 0.20, h * 0.20))
 
-            self.opponent = self.gameStateManager.opponent
-            self.opponent.image = Image(self.opponent.side_left, (384, 760))
-            self.opponent.side = "left"
-            self.opponent.body.position = (1152, 760)
-            self.opponent.collision_type = 0
+            self.npc = self.gameStateManager.npc
+            self.npc.image = Image(self.npc.side_left, (384, 760))
+            self.npc.side = "left"
+            self.npc.body.position = (1152, 760)
+            self.npc.collision_type = 6
 
-            self.opponent_sprite = Image(self.opponent.front, (self.display_score.rect.right - 5, self.display_score.rect.top + 290 + self.display_offset[0][self.opponent.name]))
-            w, h = self.opponent_sprite.image.get_size()
-            self.opponent_sprite.image = pg.transform.smoothscale(self.opponent_sprite.image, (w * 0.29, h * 0.29))
+            self.npc_sprite = Image(self.npc.front, (self.display_score.rect.right - 5, self.display_score.rect.top + 290 + self.display_offset[0][self.npc.name]))
+            w, h = self.npc_sprite.image.get_size()
+            self.npc_sprite.image = pg.transform.smoothscale(self.npc_sprite.image, (w * 0.29, h * 0.29))
             
-            self.opponent_name = Image(self.opponent.font, (self.display_score.rect.right + 65 + self.display_offset[1][self.opponent.name], self.display_score.rect.top + 298))
-            w, h = self.opponent_name.image.get_size()
-            self.opponent_name.image = pg.transform.smoothscale(self.opponent_name.image, (w * 0.20, h * 0.20))
+            self.npc_name = Image(self.npc.font, (self.display_score.rect.right + 65 + self.display_offset[1][self.npc.name], self.display_score.rect.top + 298))
+            w, h = self.npc_name.image.get_size()
+            self.npc_name.image = pg.transform.smoothscale(self.npc_name.image, (w * 0.20, h * 0.20))
 
             self.space.add(self.player.body, self.player.shape)
-            self.space.add(self.opponent.body, self.opponent.shape)
+            self.space.add(self.npc.body, self.npc.shape)
 
 
         if not self.play_music:
@@ -86,7 +89,9 @@ class GameMenu:
         
         self.space.on_collision(2, 3, begin=ball_hits_pitch, data=self.ball)
         self.space.on_collision(1, 2, begin=player_with_ball, data=self)
+        self.space.on_collision(2, 6, begin=npc_with_ball, data=self)
         self.space.on_collision(1, 3, begin=player_on_pitch, data=self.player)
+        self.space.on_collision(3, 6, begin=npc_on_pitch, data=self.npc)
         self.space.on_collision(2, 4, begin=npc_score_goal, data=self)
         self.space.on_collision(2, 5, begin=player_score_goal, data=self)
         
@@ -193,13 +198,26 @@ class GameMenu:
         if self.player.has_ball:
             if self.player.side == "left":
                 self.ball.image.rect.center = (self.player.body.position.x - 80, self.player.image.rect.bottom - 20)
+                self.ball.body.position = (self.player.body.position.x - 80, self.ball.body.position.y)
             elif self.player.side == "right":
                 self.ball.image.rect.center = (self.player.body.position.x + 80, self.player.image.rect.bottom - 20)
+                self.ball.body.position = (self.player.body.position.x + 80, self.ball.body.position.y)
+            self.ball.draw(self.screen)
+
+
+        # Update the image of the ball when NPC has the ball
+        if self.npc.has_ball:
+            if self.npc.side == "left":
+                self.ball.image.rect.center = (self.npc.body.position.x - 80, self.npc.image.rect.bottom - 20)
+                self.ball.body.position = (self.npc.body.position.x - 80, self.ball.body.position.y)
+            elif self.npc.side == "right":
+                self.ball.image.rect.center = (self.npc.body.position.x + 80, self.npc.image.rect.bottom - 20)
+                self.ball.body.position = (self.npc.body.position.x + 80, self.ball.body.position.y)
             self.ball.draw(self.screen)
 
 
         # Player drops the ball, add ball body and shape back to space
-        if not self.ball.body_in_space() and not self.player.has_ball:
+        if not self.ball.body_in_space() and not self.player.has_ball and not self.npc.has_ball:
             if self.player.side == "left":
                 self.ball.body.position = (self.player.body.position.x - 80, self.player.body.position.y)
             elif self.player.side == "right":
@@ -213,28 +231,32 @@ class GameMenu:
         # Ball movement effect
         self.ball.update_sprite(int((self.ball.body.velocity.length % 4) + 1))
         
-        if not self.player.has_ball:
+        if not self.player.has_ball and not self.npc.has_ball:
             self.ball.update()
             self.ball.draw(self.screen)
 
         self.display_score.draw(self.screen)
 
         self.player_sprite.draw(self.screen)
-        self.opponent_sprite.draw(self.screen)
+        self.npc_sprite.draw(self.screen)
         self.player_name.draw(self.screen)
-        self.opponent_name.draw(self.screen)
+        self.npc_name.draw(self.screen)
 
         font = pg.font.Font("assets/fonts/shineseiya.ttf", 140)
         self.screen.blit(font.render(str(self.timer).rjust(3), True, (255, 255, 255)), (690, 20))
         
         font = pg.font.Font("assets/fonts/shineseiya.ttf", 80)
         self.screen.blit(font.render(str(self.player.score).rjust(3), True, (255, 255, 255)), (600, 80))
-        self.screen.blit(font.render(str(self.opponent.score).rjust(3), True, (255, 255, 255)), (840, 80))
+        self.screen.blit(font.render(str(self.npc.score).rjust(3), True, (255, 255, 255)), (840, 80))
 
         self.player.update()
         self.player.draw(self.screen)
-        self.opponent.update()
-        self.opponent.draw(self.screen)
+
+        self.utility_ai.update(self.ball, self.player, self.npc)
+        self.utility_ai.execute_action(self.ball, self.npc, self.space)
+
+        self.npc.update()
+        self.npc.draw(self.screen)
 
 
 # Callback for collision between the ball and the pitch
@@ -275,12 +297,17 @@ def player_with_ball(arbiter, space, data):
             data.ball.body.apply_impulse_at_world_point((20, -data.player.shot), data.ball.body.position)  
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
 
-    elif data.press_c:
+    elif data.press_c and not data.npc.has_ball:
         data.player.has_ball = True
         data.space.remove(data.ball.body, data.ball.shape)
 
     return True
 
+
+def npc_with_ball(arbiter, space, data):
+    print("npc_with_ball")
+    data.touch_ball = True
+    return True
 
 # Callback collision between player and the pitch
 # If the player is not on the ground, cannot jump.
@@ -288,12 +315,20 @@ def player_on_pitch(arbiter, space, data):
     data.on_pitch = True
     return True
 
+def npc_on_pitch(arbiter, space, data):
+    print()
+    print()
+    print("touc no chao")
+    npc = data
+    npc.on_pitch = True
+    return True
+
 
 # Callback collision ball with left wall 
 # Ball hits the left wall, goal from the npc.
 def npc_score_goal(arbiter, space, data):        
     pg.mixer.Sound("assets/sounds/goal.mp3").play()
-    data.opponent.score += 1
+    data.npc.score += 1
     return False
 
 

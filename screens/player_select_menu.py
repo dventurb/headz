@@ -100,7 +100,7 @@ def click_button_select(self):
             player for player in self.playerManager.players 
             if player != self.gameStateManager.selected_player 
             ]
-    self.gameStateManager.opponent = random.choice(opponents)
+    self.gameStateManager.npc = random.choice(opponents)
     
     #self.gameStateManager.selected_stadium
     

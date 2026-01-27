@@ -30,7 +30,7 @@ class GameStateManager:
         self.current_state = current_state
 
         self.selected_player = None
-        self.opponent = None
+        self.npc = None
         self.selected_stadium = None
 
     def get_state(self):

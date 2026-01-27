@@ -35,7 +35,9 @@ class Player:
         
         self.shape = pm.Poly(self.body, vs)
         self.shape.friction = 0.2
-        self.shape.collision_type = 1
+        self.shape.collision_type = 1 # NPC use collision_type number 6
+
+        self.touch_ball = False # Only for NPC
 
     def draw(self, screen):
         self.image.draw(screen)
