@@ -65,7 +65,7 @@ class GameMenu:
             self.npc.image = Image(self.npc.side_left, (384, 760))
             self.npc.side = "left"
             self.npc.body.position = (1152, 760)
-            self.npc.collision_type = 6
+            self.npc.shape.collision_type = 6
 
             self.npc_sprite = Image(self.npc.front, (self.display_score.rect.right - 5, self.display_score.rect.top + 290 + self.display_offset[0][self.npc.name]))
             w, h = self.npc_sprite.image.get_size()

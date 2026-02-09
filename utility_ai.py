@@ -52,23 +52,21 @@ class UtilityAI:
         if action == Action.JUMP:
             vy0 = -npc.jump * 10
             time_reach = abs(vy0) / GRAVITY
+    
+            # Predict where the ball is going 
+            ball_y_future = ball.body.position.y + ball.body.velocity.y * time_reach + 0.5 * GRAVITY * time_reach * time_reach
 
-            ball_y = ball.body.position.y + ball.body.velocity.y * time_reach
-            
-            # h = vy0^2 / 2g
-            ymax = (vy0 * vy0) / (2 * GRAVITY)
+            npc_y_max = (vy0 * vy0) / (2 * GRAVITY)
+            distance_x_to_ball = abs(ball.body.position.x - npc.body.position.x)
 
-            #distance_x = ball.body.position.x - npc.body.position.x
-           # distance_y = npc.body.position.y - ball.body.position.y
-            
-            print(f"ball_Y: {ball_y}, ymax: {ymax}")
-            if ball_y < ymax + 300:
-                utility += 120
+            if distance_x_to_ball < 400 and ball_y_future < npc_y_max:
+                utility += 140
             else:
-                utility -= 60
-
-            if player.kick_high:
-                utility += 60
+                utility -= 100
+            
+            # NPC already in the air
+            if not npc.on_pitch:
+                utility -= 100
         
             return utility
 
@@ -142,10 +140,10 @@ class UtilityAI:
             return utility
 
         elif action == Action.WAIT:
-            if player.has_ball and npc.body.position.x > (WIDTH - 200): 
+            distance_x_to_player = abs(player.body.position.x - npc.body.position.x)
+
+            if player.has_ball and distance_x_to_player < 150: 
                 utility += 60 
-            else:
-                utility -= 60
 
             if player.body.position.x > (WIDTH / 2):
                 utility += 60
@@ -172,7 +170,7 @@ class UtilityAI:
             scores[action] = self.evaluate_action(ball, player, npc, action)
 
         best_score = max(scores, key=scores.get)
-        print(best_score)
+        #print(best_score)
 
         return best_score
 
@@ -193,10 +191,6 @@ class UtilityAI:
             case Action.WAIT:
                 self.wait(npc)
 
-        print()
-        print()
-        print(npc.has_ball)
-
     # Movement the NPC
     def move_left(self, npc):
         npc.update_sprite("left")
@@ -207,9 +201,10 @@ class UtilityAI:
         npc.body.velocity = (npc.speed * 5, npc.body.velocity.y)
 
     def jump(self, npc):
-        pg.mixer.Sound("assets/sounds/jump.mp3").play() 
-        npc.on_pitch = False
-        npc.body.velocity = (npc.body.velocity.x, -npc.jump * 10)
+        if npc.on_pitch:
+            pg.mixer.Sound("assets/sounds/jump.mp3").play() 
+            npc.on_pitch = False
+            npc.body.velocity = (npc.body.velocity.x, -npc.jump * 10)
 
     def pick_ball(self, npc, space, ball):
         npc.has_ball = True
