@@ -34,15 +34,29 @@ class UtilityAI:
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
     def evaluate_role(self, ball, player, npc):
-        #player_distance = self.distance(ball.body.position.x, ball.body.position.y, player.body.position.x, player.body.position.y) 
-        #npc_distance = self.distance(ball.body.position.x, ball.body.position.y, npc.body.position.x, npc.body.position.y) 
+        score = 0 
+
+        player_distance = self.distance(ball.body.position.x, ball.body.position.y, player.body.position.x, player.body.position.y) 
+        npc_distance = self.distance(ball.body.position.x, ball.body.position.y, npc.body.position.x, npc.body.position.y) 
 
         if npc.has_ball:
-            self.role = Role.ATTACK
+            score += 100
         elif player.has_ball:
+            score -= 100
+
+        score += (player_distance - npc_distance)
+
+        if npc.body.position.x < WIDTH / 2:
+            score += 20
+        else:
+            score -=20
+
+        if score > 40:
+            self.role = Role.ATTACK
+        elif score < -40:
             self.role = Role.DEFEND
         else:
-            self.role = Role.NEUTRAL
+            self.role = Role.NEUTRAL 
 
         return self.role
 
