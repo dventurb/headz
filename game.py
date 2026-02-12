@@ -9,6 +9,8 @@ class Game:
         self.intro = None
         self.mainMenu = None
         self.playerSelectMenu = None 
+        self.stadiumSelectMenu = None
+        self.gameMenu = None
 
         self.states = {}
 

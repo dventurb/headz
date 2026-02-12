@@ -1,7 +1,7 @@
 import pygame as pg
 
 from game import Game, GameStateManager
-from screens import IntroScreen, MainMenu, PlayerSelectMenu, GameMenu
+from screens import IntroScreen, MainMenu, PlayerSelectMenu, StadiumSelectMenu, GameMenu
 from config import WIDTH, HEIGHT
 
 def main():
@@ -23,12 +23,14 @@ def main():
     game.intro = IntroScreen(game.screen, game.clock, game.gameStateManager) 
     game.mainMenu = MainMenu(game.screen, game.clock, game.gameStateManager)
     game.playerSelectMenu = PlayerSelectMenu(game.screen, game.clock, game.gameStateManager)
+    game.stadiumSelectMenu = StadiumSelectMenu(game.screen, game.clock, game.gameStateManager)
     game.gameMenu = GameMenu(game.screen, game.clock, game.gameStateManager)
 
     game.states = {
                 "intro": game.intro, 
                 "mainMenu": game.mainMenu, 
                 "playerSelectMenu": game.playerSelectMenu,
+                "stadiumSelectMenu": game.stadiumSelectMenu,
                 "gameMenu": game.gameMenu
                }
 

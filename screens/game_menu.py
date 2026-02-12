@@ -20,10 +20,6 @@ class GameMenu:
         self.ball = Ball(self.space, "assets/ball/ball_1.png", (768, 100))
         self.pitch = Pitch(self.space)
         
-        # TODO: The user can select the stadium  
-        self.stadium = pg.image.load("assets/stadiums/portugal.png").convert()
-        self.stadium = pg.transform.scale(self.stadium, (WIDTH, HEIGHT))
-
         self.display_score = Image("assets/display.png", (768, 100))
         
         # Sprites of each character have different sizes, so these values are used to center each one on the scoreboard. First dict represents the front sprite and the second represents the name img.
@@ -37,6 +33,7 @@ class GameMenu:
 
         self.player = None
         self.npc = None
+        self.stadium = None
 
         self.utility_ai = UtilityAI()
 
@@ -78,9 +75,13 @@ class GameMenu:
             self.space.add(self.player.body, self.player.shape)
             self.space.add(self.npc.body, self.npc.shape)
 
+        if self.stadium is None:
+            self.stadium = self.gameStateManager.selected_stadium
+            self.stadium.image = pg.image.load(self.stadium.stadium).convert()
+            self.stadium.image = pg.transform.scale(self.stadium.image, (WIDTH, HEIGHT))
 
         if not self.play_music:
-            pg.mixer.music.load("assets/sounds/portugal.mp3")
+            pg.mixer.music.load(self.stadium.sound)
             pg.mixer.music.play(-1)
             self.play_music = True
        
@@ -226,7 +227,7 @@ class GameMenu:
 
 
     def draw(self):
-        self.screen.blit(self.stadium, (0, 0))
+        self.screen.blit(self.stadium.image, (0, 0))
         
         # Ball movement effect
         self.ball.update_sprite(int((self.ball.body.velocity.length % 4) + 1))
@@ -254,6 +255,8 @@ class GameMenu:
 
         self.utility_ai.update(self.ball, self.player, self.npc)
         self.utility_ai.execute_action(self.ball, self.npc, self.space)
+        print(self.utility_ai.action)
+        print(self.utility_ai.role)
 
         self.npc.update()
         self.npc.draw(self.screen)
@@ -316,9 +319,6 @@ def player_on_pitch(arbiter, space, data):
     return True
 
 def npc_on_pitch(arbiter, space, data):
-    print()
-    print()
-    print("touc no chao")
     npc = data
     npc.on_pitch = True
     return True

@@ -21,8 +21,6 @@ class Action(Enum):
 
 class UtilityAI:
     def __init__(self):
-        self.visited = {}
-
         self.role = Role.ATTACK
         self.action = Action.MOVE_LEFT
 
@@ -50,6 +48,10 @@ class UtilityAI:
             score += 20
         else:
             score -=20
+        
+        if ball.body_in_space():
+            if ball.body.velocity.x < 0:
+                score += 20
 
         if score > 40:
             self.role = Role.ATTACK
@@ -62,79 +64,82 @@ class UtilityAI:
 
     def evaluate_action(self, ball, player, npc, action):
         utility = 0
-
+        
+        if ball.body_in_space():
+            dx_ball = ball.body.position.x - npc.body.position.x 
+        elif player.has_ball:
+            dx_ball = player.body.position.x - npc.body.position.x 
+        else:
+            dx_ball = 0
+        
+        # JUMP 
         if action == Action.JUMP:
             vy0 = -npc.jump * 10
             time_reach = abs(vy0) / GRAVITY
     
-            # Predict where the ball is going 
+            # Predict where the ball is going (y = y0 + v0t - 1/2gt^2) 
             ball_y_future = ball.body.position.y + ball.body.velocity.y * time_reach + 0.5 * GRAVITY * time_reach * time_reach
 
             npc_y_max = (vy0 * vy0) / (2 * GRAVITY)
-            distance_x_to_ball = abs(ball.body.position.x - npc.body.position.x)
 
-            if distance_x_to_ball < 400 and ball_y_future < npc_y_max:
+            if abs(dx_ball) < 400 and ball_y_future < npc_y_max + 50:
                 utility += 140
             else:
                 utility -= 100
             
             # NPC already in the air
             if not npc.on_pitch:
-                utility -= 100
+                utility -= 200
         
             return utility
-
+        
+        # Move Left
         elif action == Action.MOVE_LEFT:
-            if ball.body_in_space():
-                dx_ball = ball.body.position.x - npc.body.position.x 
-                
-                # Ball on the left of the NPC
-                if dx_ball < 0:
-                    utility += 60
-                else:
-                    utility -= 30
-
-                if self.role == Role.ATTACK and dx_ball < 0:
-                    utility += 40 
+            # Ball on the left of the NPC
+            if dx_ball < 0:
+                utility += 60
             else:
-                if npc.has_ball:
-                    utility += 60
-                elif player.has_ball:
-                    utility -= 60
+                utility -= 30
+
+            if self.role == Role.ATTACK and dx_ball < 0:
+                utility += 40 
+
+            if self.role == Role.DEFEND and npc.body.position.x > WIDTH / 2:
+                utility += 20
 
             return utility
 
+        # Move Right
         elif action == Action.MOVE_RIGHT:
-            if ball.body_in_space():
-                dx_ball = ball.body.position.x - npc.body.position.x 
-
-                if dx_ball > 0:
-                    utility += 60
-                else:
-                    utility -= 30
-
-                if self.role == Role.DEFEND:
-                    utility += 60
+            if dx_ball > 0 :
+                utility += 60
             else:
-                if npc.has_ball:
-                    utility -= 60
-                elif player.has_ball and npc.body.position.x < (WIDTH - 100):
-                    utility += 60 
-                else:
-                    utility -= 60
+                utility -= 30
+
+            if self.role == Role.DEFEND:
+                utility += 30 
+
+            if self.role == Role.DEFEND and npc.body.position.x < WIDTH / 2: 
+                utility += 20 
 
             return utility
 
         elif action == Action.PICK_BALL:
+            if npc.has_ball:
+               return -80 
+
             d_ball = self.distance(ball.body.position.x, ball.body.position.y, npc.body.position.x, npc.body.position.y) 
             d_player = self.distance(player.body.position.x, player.body.position.y, npc.body.position.x, npc.body.position.y)
 
-            if abs(d_ball) in range(0, 150) and not player.has_ball:
+            if d_ball < 150 and not player.has_ball:
                 utility += 160
-            elif abs(d_player) in range(0, 150) and player.has_ball:
+            elif d_player < 150 and player.has_ball:
                 utility += 140
             else:
                 utility -= 80
+
+            if self.role == Role.ATTACK:
+                utility += 20
 
             return utility
 
@@ -159,8 +164,8 @@ class UtilityAI:
             if player.has_ball and distance_x_to_player < 150: 
                 utility += 60 
 
-            if player.body.position.x > (WIDTH / 2):
-                utility += 60
+            if self.role == Role.NEUTRAL:
+                utility += 30 
 
             return utility
 

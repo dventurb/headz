@@ -92,8 +92,6 @@ def click_button_right(self):
 def click_button_select(self):
     pg.mixer.Sound("assets/sounds/start.mp3").play()
     
-    pg.mixer.music.stop()
-
     self.gameStateManager.selected_player = self.playerManager.players[self.current_player_index]
 
     opponents = [
@@ -102,10 +100,8 @@ def click_button_select(self):
             ]
     self.gameStateManager.npc = random.choice(opponents)
     
-    #self.gameStateManager.selected_stadium
-    
-    # Set screen to game play scene
-    self.gameStateManager.set_state("gameMenu")
+    # set screen to stadium select menu.
+    self.gameStateManager.set_state("stadiumSelectMenu")
 
 def update_button(self, button):
     button.check_hover()
