@@ -233,10 +233,10 @@ class UtilityAI:
     def kick_low(self, npc, ball):
         if npc.side == "left":
             ball.body.position = npc.body.position - (40, 0)
-            ball.body.apply_impulse_at_world_point((-npc.shot * 10, 0), ball.body.position)
+            ball.body.apply_impulse_at_world_point((-npc.shot * 2, 0), ball.body.position)
         elif npc.side == "right":
             ball.body.position = npc.body.position + (40, 0)
-            ball.body.apply_impulse_at_world_point((npc.shot * 10, 0), ball.body.position)         
+            ball.body.apply_impulse_at_world_point((npc.shot * 2, 0), ball.body.position)         
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
         npc.has_ball = False
 
@@ -245,10 +245,10 @@ class UtilityAI:
             space.add(ball.body, ball.shape)
         if npc.side == "left":
             ball.body.position = npc.body.position - (40, 0)
-            ball.body.apply_impulse_at_world_point((-npc.shot * 5, -300), ball.body.position)
+            ball.body.apply_impulse_at_world_point((-npc.shot * 2, -200), ball.body.position)
         elif npc.side == "right":
             ball.body.position = npc.body.position + (40, 0)
-            ball.body.apply_impulse_at_world_point((npc.shot * 5, -300), ball.body.position)         
+            ball.body.apply_impulse_at_world_point((npc.shot * 2, -200), ball.body.position)         
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
         npc.has_ball = False
 

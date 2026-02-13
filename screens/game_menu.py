@@ -40,8 +40,9 @@ class GameMenu:
         self.players = {}
 
         self.press_c = False
- 
         self.play_music = False
+        self.start = False
+
 
     def run(self, events):
         if self.player is None or self.npc is None:
@@ -84,7 +85,7 @@ class GameMenu:
             pg.mixer.music.load(self.stadium.sound)
             pg.mixer.music.play(-1)
             self.play_music = True
-       
+            
 
         self.space.step(1/60)
         
@@ -96,7 +97,8 @@ class GameMenu:
         self.space.on_collision(2, 4, begin=npc_score_goal, data=self)
         self.space.on_collision(2, 5, begin=player_score_goal, data=self)
         
-        self.draw()
+        if self.start:
+            self.draw()
 
       # Movement the player
         keys = pg.key.get_pressed()
@@ -141,9 +143,15 @@ class GameMenu:
             # Countdown timer
             # References: https://stackoverflow.com/questions/30720665/countdown-timer-in-pygame
             if event.type == pg.USEREVENT:
-                if self.timer > 0:
-                    self.timer -= 1
-                #else:
+                if self.start and self.timer > 0:
+                    self.timer -= 1 
+                elif not self.start:
+                    if self.timer <= 87: # 3 seconds
+                        self.timer = 90
+                        self.start = True
+                    self.timer -= 1 
+                    update_screen_countdown(self)
+
         
 
        # Player have the ball and presse z or x for shoting 
@@ -153,10 +161,10 @@ class GameMenu:
                     self.space.add(self.ball.body, self.ball.shape)
                 if self.player.side == "left":
                     self.ball.body.position = self.player.body.position - (40, 0)
-                    self.ball.body.apply_impulse_at_world_point((-self.player.shot * 5, -300), self.ball.body.position)
+                    self.ball.body.apply_impulse_at_world_point((-self.player.shot * 2, -200), self.ball.body.position)
                 elif self.player.side == "right":
                     self.ball.body.position = self.player.body.position + (40, 0)
-                    self.ball.body.apply_impulse_at_world_point((self.player.shot * 5, -300), self.ball.body.position)             
+                    self.ball.body.apply_impulse_at_world_point((self.player.shot * 2, -200), self.ball.body.position)             
                 pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
                 self.player.has_ball = False
                 self.press_c = False
@@ -166,10 +174,10 @@ class GameMenu:
                     self.space.add(self.ball.body, self.ball.shape)
                 if self.player.side == "left":
                     self.ball.body.position = self.player.body.position - (40, 0)
-                    self.ball.body.apply_impulse_at_world_point((-self.player.shot * 10, 0), self.ball.body.position)
+                    self.ball.body.apply_impulse_at_world_point((-self.player.shot * 2, 0), self.ball.body.position)
                 elif self.player.side == "right":
                     self.ball.body.position = self.player.body.position + (40, 0)
-                    self.ball.body.apply_impulse_at_world_point((self.player.shot * 10, 0), self.ball.body.position)             
+                    self.ball.body.apply_impulse_at_world_point((self.player.shot * 2, 0), self.ball.body.position)             
                 pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
                 self.player.has_ball = False 
                 self.press_c = False
@@ -189,14 +197,13 @@ class GameMenu:
                 self.player.lift_ball = False
 
 
-        # TODO: First do the goal score 
         # Limit the max heigh a ball can reach
-        if self.ball.body.position.y > HEIGHT:
-            self.ball.body.position = (max(min(self.ball.body.position.x, (HEIGHT - 50)), 50), 100)
+        #if self.ball.body.position.y > HEIGHT:
+         #   self.ball.body.position = (max(min(self.ball.body.position.x, (WIDTH - 100)), 100), 100)
         
 
         # Update the image of the ball when player has the ball
-        if self.player.has_ball:
+        if self.player.has_ball and not self.npc.has_ball:
             if self.player.side == "left":
                 self.ball.image.rect.center = (self.player.body.position.x - 80, self.player.image.rect.bottom - 20)
                 self.ball.body.position = (self.player.body.position.x - 80, self.ball.body.position.y)
@@ -207,7 +214,7 @@ class GameMenu:
 
 
         # Update the image of the ball when NPC has the ball
-        if self.npc.has_ball:
+        if self.npc.has_ball and not self.player.has_ball:
             if self.npc.side == "left":
                 self.ball.image.rect.center = (self.npc.body.position.x - 80, self.npc.image.rect.bottom - 20)
                 self.ball.body.position = (self.npc.body.position.x - 80, self.ball.body.position.y)
@@ -242,7 +249,7 @@ class GameMenu:
         self.npc_sprite.draw(self.screen)
         self.player_name.draw(self.screen)
         self.npc_name.draw(self.screen)
-
+        
         font = pg.font.Font("assets/fonts/shineseiya.ttf", 140)
         self.screen.blit(font.render(str(self.timer).rjust(3), True, (255, 255, 255)), (690, 20))
         
@@ -255,11 +262,26 @@ class GameMenu:
 
         self.utility_ai.update(self.ball, self.player, self.npc)
         self.utility_ai.execute_action(self.ball, self.npc, self.space)
-        print(self.utility_ai.action)
-        print(self.utility_ai.role)
+        #print(self.utility_ai.action)
+        #print(self.utility_ai.role)
 
         self.npc.update()
         self.npc.draw(self.screen)
+
+
+def reset_after_goal(self, side):
+    if side == "LEFT":
+        self.ball.body.position = (300, 100)
+    elif side == "RIGHT":
+        self.ball.body.position = (WIDTH - 300, 100);
+
+    self.player.body.position = (384, 760)        
+    self.player.update()
+    self.player.draw(self.screen)
+
+    self.npc.body.position = (1152, 760)
+    self.npc.update()
+    self.npc.draw(self.screen)
 
 
 # Callback for collision between the ball and the pitch
@@ -276,19 +298,19 @@ def player_with_ball(arbiter, space, data):
     if data.player.kick_low:
         if data.player.side == "left":
             data.ball.body.position = data.player.body.position - (40, 0)
-            data.ball.body.apply_impulse_at_world_point((-data.player.shot * 10, 0), data.ball.body.position)
+            data.ball.body.apply_impulse_at_world_point((-data.player.shot * 2, 0), data.ball.body.position)
         elif data.player.side == "right":
             data.ball.body.position = data.player.body.position + (40, 0)
-            data.ball.body.apply_impulse_at_world_point((data.player.shot * 10, 0), data.ball.body.position)         
+            data.ball.body.apply_impulse_at_world_point((data.player.shot * 2, 0), data.ball.body.position)         
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
     
     elif data.player.kick_high:
         if data.player.side == "left":
             data.ball.body.position = data.player.body.position - (40, 0)
-            data.ball.body.apply_impulse_at_world_point((-data.player.shot * 5, -300), data.ball.body.position)
+            data.ball.body.apply_impulse_at_world_point((-data.player.shot * 2, -200), data.ball.body.position)
         elif data.player.side == "right":
             data.ball.body.position = data.player.body.position + (40, 0)
-            data.ball.body.apply_impulse_at_world_point((data.player.shot * 5, -300), data.ball.body.position)    
+            data.ball.body.apply_impulse_at_world_point((data.player.shot * 2, -200), data.ball.body.position)    
         pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
 
     elif data.player.lift_ball:
@@ -308,7 +330,6 @@ def player_with_ball(arbiter, space, data):
 
 
 def npc_with_ball(arbiter, space, data):
-    print("npc_with_ball")
     data.touch_ball = True
     return True
 
@@ -328,7 +349,8 @@ def npc_on_pitch(arbiter, space, data):
 # Ball hits the left wall, goal from the npc.
 def npc_score_goal(arbiter, space, data):        
     pg.mixer.Sound("assets/sounds/goal.mp3").play()
-    data.npc.score += 1
+    data.npc.score += 1 
+    reset_after_goal(data, "LEFT")
     return False
 
 
@@ -337,5 +359,24 @@ def npc_score_goal(arbiter, space, data):
 def player_score_goal(arbiter, space, data):
     pg.mixer.Sound("assets/sounds/goal.mp3").play()
     data.player.score += 1
+    reset_after_goal(data, "RIGHT")
     return False
 
+
+def update_screen_countdown(self):
+    self.screen.blit(self.stadium.image, (0, 0))
+    self.display_score.draw(self.screen)
+    self.player_sprite.draw(self.screen)
+    self.npc_sprite.draw(self.screen)
+    self.player_name.draw(self.screen)
+    self.npc_name.draw(self.screen)
+    font = pg.font.Font("assets/fonts/shineseiya.ttf", 140)
+    self.screen.blit(font.render(str(90).rjust(3), True, (255, 255, 255)), (690, 20))
+    font = pg.font.Font("assets/fonts/shineseiya.ttf", 80)
+    self.screen.blit(font.render(str(self.player.score).rjust(3), True, (255, 255, 255)), (600, 80))
+    self.screen.blit(font.render(str(self.npc.score).rjust(3), True, (255, 255, 255)), (840, 80))
+    self.player.draw(self.screen)
+    self.npc.draw(self.screen)                    
+    countdown = Image(f"assets/countdown/{abs(self.timer - 90)}.png", ((WIDTH / 2), 400))
+    countdown.draw(self.screen)
+    pg.mixer.Sound("assets/sounds/countdown.mp3").play()
