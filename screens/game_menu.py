@@ -60,7 +60,7 @@ class GameMenu:
             self.player_name.image = pg.transform.smoothscale(self.player_name.image, (w * 0.20, h * 0.20))
 
             self.npc = self.gameStateManager.npc
-            self.npc.image = Image(self.npc.side_left, (384, 760))
+            self.npc.image = Image(self.npc.side_left, (1152, 760))
             self.npc.side = "left"
             self.npc.body.position = (1152, 760)
             self.npc.shape.collision_type = 6
@@ -88,33 +88,20 @@ class GameMenu:
             
 
         self.space.step(1/60)
-        
-        self.space.on_collision(2, 3, begin=ball_hits_pitch, data=self.ball)
-        self.space.on_collision(1, 2, begin=player_with_ball, data=self)
-        self.space.on_collision(2, 6, begin=npc_with_ball, data=self)
-        self.space.on_collision(1, 3, begin=player_on_pitch, data=self.player)
-        self.space.on_collision(3, 6, begin=npc_on_pitch, data=self.npc)
-        self.space.on_collision(2, 4, begin=npc_score_goal, data=self)
-        self.space.on_collision(2, 5, begin=player_score_goal, data=self)
-        
-        if self.start:
-            self.draw()
-
-      # Movement the player
-        keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT]: 
-            self.player.update_sprite("left")
-            self.player.body.velocity = (-self.player.speed * 5, self.player.body.velocity.y)
-        if keys[pg.K_RIGHT]:
-            self.player.update_sprite("right")
-            self.player.body.velocity = (self.player.speed * 5, self.player.body.velocity.y)
-        if keys[pg.K_UP] and self.player.on_pitch:
-            pg.mixer.Sound("assets/sounds/jump.mp3").play() 
-            self.player.on_pitch = False
-            self.player.body.velocity = (self.player.body.velocity.x, -self.player.jump * 10)    
-   
 
         for event in events:
+            # Countdown timer
+            # References: https://stackoverflow.com/questions/30720665/countdown-timer-in-pygame
+            if event.type == pg.USEREVENT:
+                if self.start and self.timer > 0:
+                    self.timer -= 1 
+                elif not self.start:
+                    if self.timer <= 87: # 3 seconds
+                        self.timer = 90
+                        self.ball = Ball(self.space, "assets/ball/ball_1.png", (768, 100))
+                        self.start = True
+                    self.timer -= 1 
+                    update_screen_countdown(self)
             # Check when z, x, c keys was pressed (KEYDOWN) and released (KEYUP)
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_z:
@@ -140,19 +127,35 @@ class GameMenu:
                 if event.key == pg.K_c:
                     self.press_c = False
                     self.player.has_ball = False
-            # Countdown timer
-            # References: https://stackoverflow.com/questions/30720665/countdown-timer-in-pygame
-            if event.type == pg.USEREVENT:
-                if self.start and self.timer > 0:
-                    self.timer -= 1 
-                elif not self.start:
-                    if self.timer <= 87: # 3 seconds
-                        self.timer = 90
-                        self.start = True
-                    self.timer -= 1 
-                    update_screen_countdown(self)
 
+
+        if not self.start:
+            return
+
+        self.space.on_collision(2, 3, begin=ball_hits_pitch, data=self.ball)
+        self.space.on_collision(1, 2, begin=player_with_ball, data=self)
+        self.space.on_collision(2, 6, begin=npc_with_ball, data=self)
+        self.space.on_collision(1, 3, begin=player_on_pitch, data=self.player)
+        self.space.on_collision(3, 6, begin=npc_on_pitch, data=self.npc)
+        self.space.on_collision(2, 4, begin=npc_score_goal, data=self)
+        self.space.on_collision(2, 5, begin=player_score_goal, data=self)
         
+        self.draw()
+
+
+      # Movement the player
+        keys = pg.key.get_pressed()
+        if keys[pg.K_LEFT]: 
+            self.player.update_sprite("left")
+            self.player.body.velocity = (-self.player.speed * 5, self.player.body.velocity.y)
+        if keys[pg.K_RIGHT]:
+            self.player.update_sprite("right")
+            self.player.body.velocity = (self.player.speed * 5, self.player.body.velocity.y)
+        if keys[pg.K_UP] and self.player.on_pitch:
+            pg.mixer.Sound("assets/sounds/jump.mp3").play() 
+            self.player.on_pitch = False
+            self.player.body.velocity = (self.player.body.velocity.x, -self.player.jump * 10)    
+   
 
        # Player have the ball and presse z or x for shoting 
         if self.player.has_ball:
