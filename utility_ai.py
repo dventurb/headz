@@ -227,8 +227,7 @@ class UtilityAI:
 
     def pick_ball(self, npc, space, ball):
         npc.has_ball = True
-        if ball.body_in_space():
-            space.remove(ball.body, ball.shape)
+        ball.shape.sensor = True
 
     def kick_low(self, npc, ball):
         if npc.side == "left":

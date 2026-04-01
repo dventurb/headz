@@ -8,8 +8,8 @@ class Pitch:
 
         self.pitch = pm.Segment(self.body, (0, 860), (WIDTH, 860), 10)
         
-        self.left_wall = pm.Segment(self.body, (0, 0), (0, HEIGHT), 1)
-        self.right_wall = pm.Segment(self.body, (WIDTH, 0), (WIDTH, HEIGHT), 1)
+        self.left_wall = pm.Segment(self.body, (0, 0), (0, HEIGHT), 10)
+        self.right_wall = pm.Segment(self.body, (WIDTH, 0), (WIDTH, HEIGHT), 10)
 
         self.pitch.friction = 0.6
         self.pitch.elasticity = 0.5

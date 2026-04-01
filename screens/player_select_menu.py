@@ -15,6 +15,9 @@ class PlayerSelectMenu:
 
         self.background = pg.image.load("assets/backgrounds/select_player_menu.png").convert()
         
+        self.switch_sound = pg.mixer.Sound("assets/sounds/switch.mp3")
+        self.start_sound = pg.mixer.Sound("assets/sounds/start.mp3")
+
         self.buttons = {
                 "left":  ButtonImage(pg.image.load("assets/buttons/left.png"), (418, 438), click_button_left),
                 "right": ButtonImage(pg.image.load("assets/buttons/right.png"), (990, 438), click_button_right),
@@ -70,7 +73,7 @@ class PlayerSelectMenu:
 
 
 def click_button_left(self):
-    pg.mixer.Sound("assets/sounds/switch.mp3").play()
+    self.switch_sound.play()
 
     self.current_player_index = (self.current_player_index - 1) % len(self.playerManager.players)
 
@@ -80,7 +83,7 @@ def click_button_left(self):
 
 
 def click_button_right(self):
-    pg.mixer.Sound("assets/sounds/switch.mp3").play()
+    self.switch_sound.play()
     
     self.current_player_index = (self.current_player_index + 1) % len(self.playerManager.players)
 
@@ -90,7 +93,7 @@ def click_button_right(self):
 
 
 def click_button_select(self):
-    pg.mixer.Sound("assets/sounds/start.mp3").play()
+    self.start_sound.play()
     
     self.gameStateManager.selected_player = self.playerManager.players[self.current_player_index]
 
@@ -102,6 +105,7 @@ def click_button_select(self):
     
     # set screen to stadium select menu.
     self.gameStateManager.set_state("stadiumSelectMenu")
+
 
 def update_button(self, button):
     button.check_hover()

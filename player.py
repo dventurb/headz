@@ -54,6 +54,12 @@ class Player:
             self.side = "right"
             self.image = Image(self.side_right, (self.body.position))
 
+    def reset_actions(self):
+        self.kick_low = False
+        self.kick_high = False
+        self.lift_ball = False
+        self.has_ball = False
+
 class PlayerManager:
     def __init__(self):
         self.players = []

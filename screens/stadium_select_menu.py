@@ -14,6 +14,9 @@ class StadiumSelectMenu:
 
         self.background = pg.image.load("assets/backgrounds/select_player_menu.png").convert()
         
+        self.switch_sound = pg.mixer.Sound("assets/sounds/switch.mp3")
+        self.start_sound = pg.mixer.Sound("assets/sounds/start.mp3")
+        
         self.buttons = {
                 "left":  ButtonImage(pg.image.load("assets/buttons/left.png"), (368, 438), click_button_left),
                 "right": ButtonImage(pg.image.load("assets/buttons/right.png"), (1040, 438), click_button_right),
@@ -60,7 +63,7 @@ class StadiumSelectMenu:
 
 
 def click_button_left(self):
-    pg.mixer.Sound("assets/sounds/switch.mp3").play()
+    self.switch_sound.play()
 
     self.current_stadium_index = (self.current_stadium_index - 1) % len(self.stadiumManager.stadiums)
 
@@ -68,7 +71,7 @@ def click_button_left(self):
 
 
 def click_button_right(self):
-    pg.mixer.Sound("assets/sounds/switch.mp3").play()
+    self.switch_sound.play()
     
     self.current_stadium_index = (self.current_stadium_index + 1) % len(self.stadiumManager.stadiums)
 
@@ -76,7 +79,7 @@ def click_button_right(self):
 
 
 def click_button_select(self):
-    pg.mixer.Sound("assets/sounds/start.mp3").play()
+    self.start_sound.play()
     
     pg.mixer.music.stop()
 
