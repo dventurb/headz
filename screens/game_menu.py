@@ -7,6 +7,7 @@ from widgets import Image
 from ball import Ball
 from pitch import Pitch
 from utility_ai import UtilityAI
+from player import Side
 
 class GameMenu:
     def __init__(self, screen, clock, gameStateManager):
@@ -126,6 +127,7 @@ class GameMenu:
 
     def handle_events(self, events):
         for event in events:
+            
             # Countdown timer
             # References: https://stackoverflow.com/questions/30720665/countdown-timer-in-pygame
             if event.type == pg.USEREVENT:
@@ -134,11 +136,9 @@ class GameMenu:
 
                 elif not self.start:
                     if self.timer <= 87: # 3 seconds
-                        self.timer = 90 #reset
+                        self.timer = 90 # reset (90 seconds)
                         self.ball.body.position = (768, 100)
-                        self.ball.update()
-                        self.ball.draw(self.screen)
-                        self.draw()
+                        self.ball.body.velocity = (0, 0)
                         self.start = True
 
                     self.timer -= 1 
@@ -181,11 +181,11 @@ class GameMenu:
         keys = pg.key.get_pressed()
 
         if keys[pg.K_LEFT]: 
-            self.player.update_sprite("left")
+            self.player.update_sprite(Side.LEFT)
             self.player.body.velocity = (-self.player.speed * 5, self.player.body.velocity.y)
         
         elif keys[pg.K_RIGHT]:
-            self.player.update_sprite("right")
+            self.player.update_sprite(Side.RIGHT)
             self.player.body.velocity = (self.player.speed * 5, self.player.body.velocity.y)
         
         else: 
@@ -212,7 +212,7 @@ class GameMenu:
 
         # Player drops the ball, add ball body and shape back to space
         if not self.ball.body_in_space() and not self.player.has_ball and not self.npc.has_ball:
-            direction = -1 if self.player.side == "left" else 1 
+            direction = self.player.side.direction()
 
             self.ball.body.position = (self.player.body.position.x + direction * 80, self.player.body.position.y)
             self.space.add(self.ball.body, self.ball.shape)
@@ -246,8 +246,8 @@ class GameMenu:
         if not self.ball.body_in_space():
             self.space.add(self.ball.body, self.ball.shape)
            
-        offset = -40 if player.side == "left" else 40 
-        direction = -1 if player.side == "left" else 1
+        offset = player.side.offset()
+        direction = player.side.direction()
 
         self.ball.body.position = player.body.position + (offset, 0)
 
@@ -267,7 +267,7 @@ class GameMenu:
         if not self.ball.body_in_space():
             self.space.add(self.ball.body, self.ball.shape)
         
-        direction = -1 if player.side ==  "left" else 1 
+        direction = player.side.direction()
 
         self.ball.body.position = player.body.position + (direction * 40, -150)
         
@@ -280,19 +280,19 @@ class GameMenu:
         player.reset_actions()
 
 
-    def reset_after_goal(self, side):
+    def reset_after_goal(self, side : Side):
         self.press_c = False 
         self.player.reset_actions()
         self.npc.reset_actions()
 
         # reset ball positon
-        if side == "left":
-            self.ball.body.position = (300, 100)
-        elif side == "right":
-            self.ball.body.position = (WIDTH - 300, 100)
+        if side == Side.LEFT:
+            self.ball.body.position = (400, 100)
+        elif side == Side.RIGHT:
+            self.ball.body.position = (WIDTH - 400, 100)
 
-        self.player.body.position = (384, 760)        
-        self.npc.body.position = (1152, 760)
+        self.player.body.position = (300, 760)        
+        self.npc.body.position = (WIDTH - 300, 760)
        
         self.ball.body.velocity = (0, 0)
         self.player.body.velocity = (0, 0)
@@ -313,7 +313,7 @@ class GameMenu:
 
 
     def attach_ball_to_player(self, player):
-        direction = -1 if player.side  == "left" else 1
+        direction = player.side.direction()
         
         self.ball.image.rect.center = (player.body.position.x + direction * 80, player.image.rect.bottom - 20)
 
@@ -350,7 +350,7 @@ class GameMenu:
     def setup_player(self):
         self.player = self.gameStateManager.selected_player
         self.player.image = Image(self.player.side_right, (384, 760))
-        self.player.side = "right"
+        self.player.side = Side.RIGHT
         self.player.body.position = (384, 760)        
 
         self.player_sprite = Image(self.player.front, (self.display_score.rect.left + 215, self.display_score.rect.top + 290 + self.display_offset[0][self.player.name]))
@@ -367,7 +367,7 @@ class GameMenu:
     def setup_npc(self):
         self.npc = self.gameStateManager.npc
         self.npc.image = Image(self.npc.side_left, (1152, 760))
-        self.npc.side = "left"
+        self.npc.side = Side.LEFT
         self.npc.body.position = (1152, 760)
         self.npc.shape.collision_type = 6
 
@@ -385,10 +385,9 @@ class GameMenu:
 # Callback for collision between the ball and the pitch
 # Used to play sound of the ball hits the ground.
 def ball_hits_pitch(arbiter, space, data):
-    if not data.start:
-        return False 
-
-    data.ball_sound.play() 
+    if data.start:
+        data.ball_sound.play() 
+    
     #data.ball.body.velocity = (random.choice([100, -100]), data.body.velocity.y)
     return True
 
@@ -425,7 +424,7 @@ def npc_score_goal(arbiter, space, data):
     data.goal_sound.play()
     data.npc.score += 1 
     print("npc score")  # Debug
-    data.reset_after_goal("left")
+    data.reset_after_goal(Side.LEFT)
     return False
 
 
@@ -435,5 +434,5 @@ def player_score_goal(arbiter, space, data):
     data.goal_sound.play()
     data.player.score += 1
     print("player score")  # Debug
-    data.reset_after_goal("right")
+    data.reset_after_goal(Side.RIGHT)
     return False

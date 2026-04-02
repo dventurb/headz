@@ -12,7 +12,7 @@ class IntroScreen:
         self.gameStateManager = gameStateManager 
 
         self.video = cv2.VideoCapture("assets/videos/video.mp4") 
-        self.music = pg.mixer.music.load("assets/sounds/intro.mp3")
+        self.music = pg.mixer.Sound("assets/sounds/intro.mp3")
 
     def run(self, events):
         # References: https://stackoverflow.com/questions/21356439/how-to-load-and-play-a-video-in-pygame
@@ -23,7 +23,7 @@ class IntroScreen:
             sys.exit(1)
 
         # Play intro sound effect
-        self.music.play(1)
+        self.music.play()
 
         while video_play:
             video_surf = pg.image.frombuffer(video_image.tobytes(), video_image.shape[1::-1], "BGR")

@@ -1,7 +1,18 @@
 import pygame as pg 
 import pymunk as pm
+from enum import Enum
 
 from widgets import Image
+
+class Side(Enum):
+    LEFT = 0 
+    RIGHT = 1 
+
+    def direction(self):
+        return -1 if self == Side.LEFT else 1 
+
+    def offset(self):
+        return -40 if self == Side.LEFT else 40 
 
 class Player:
     def __init__(self, name : str, path: str, shot: int, jump: int, speed: int):
@@ -45,13 +56,13 @@ class Player:
     def update(self):
         self.image.rect.center = self.body.position
 
-    def update_sprite(self, side : str):
-        if side == "left":
-            self.side = "left"
+    def update_sprite(self, side : Side):
+        if side == Side.LEFT:
+            self.side = Side.LEFT
             self.image = Image(self.side_left, (self.body.position))
 
-        elif side == "right":
-            self.side = "right"
+        elif side == Side.RIGHT:
+            self.side = Side.RIGHT
             self.image = Image(self.side_right, (self.body.position))
 
     def reset_actions(self):

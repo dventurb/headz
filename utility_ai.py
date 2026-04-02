@@ -3,6 +3,7 @@ import math
 from enum import Enum
 
 from config import WIDTH, HEIGHT, GRAVITY
+from player import Side
 
 class Role(Enum):
     ATTACK = 0
@@ -23,6 +24,9 @@ class UtilityAI:
     def __init__(self):
         self.role = Role.ATTACK
         self.action = Action.MOVE_LEFT
+
+        self.jump_sound = pg.mixer.Sound("assets/sounds/jump.mp3")
+        self.kick_sound = pg.mixer.Sound("assets/sounds/ball_kick.mp3")
 
     def update(self, ball, player, npc):
         self.role = self.evaluate_role(ball, player, npc)
@@ -202,9 +206,9 @@ class UtilityAI:
             case Action.MOVE_RIGHT:
                 self.move_right(npc)
             case Action.HIGH_KICK:
-                self.kick_high(npc, ball, space)
+                self.kick_ball(npc, space, ball, False)
             case Action.LOW_KICK:
-                self.kick_low(npc, ball)
+                self.kick_ball(npc, space, ball, False)
             case Action.PICK_BALL:
                 self.pick_ball(npc, space, ball)
             case Action.WAIT:
@@ -212,49 +216,43 @@ class UtilityAI:
 
     # Movement the NPC
     def move_left(self, npc):
-        npc.update_sprite("left")
+        npc.update_sprite(Side.LEFT)
         npc.body.velocity = (-npc.speed * 5, npc.body.velocity.y)
 
     def move_right(self, npc):
-        npc.update_sprite("right")
+        npc.update_sprite(Side.RIGHT)
         npc.body.velocity = (npc.speed * 5, npc.body.velocity.y)
 
     def jump(self, npc):
         if npc.on_pitch:
-            pg.mixer.Sound("assets/sounds/jump.mp3").play() 
+            self.jump_sound.play() 
             npc.on_pitch = False
             npc.body.velocity = (npc.body.velocity.x, -npc.jump * 10)
 
     def pick_ball(self, npc, space, ball):
+        if ball.body_in_space():
+            space.remove(ball.body, ball.shape)
+
         npc.has_ball = True
-        ball.shape.sensor = True
 
-    def kick_low(self, npc, ball):
-        if npc.side == "left":
-            ball.body.position = npc.body.position - (40, 0)
-            ball.body.apply_impulse_at_world_point((-npc.shot * 2, 0), ball.body.position)
-        elif npc.side == "right":
-            ball.body.position = npc.body.position + (40, 0)
-            ball.body.apply_impulse_at_world_point((npc.shot * 2, 0), ball.body.position)         
-        pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
-        npc.has_ball = False
-
-    def kick_high(self, npc, ball, space):
+    def kick_ball(self, npc, space, ball, high):
         if not ball.body_in_space():
             space.add(ball.body, ball.shape)
-        if npc.side == "left":
-            ball.body.position = npc.body.position - (40, 0)
-            ball.body.apply_impulse_at_world_point((-npc.shot * 2, -200), ball.body.position)
-        elif npc.side == "right":
-            ball.body.position = npc.body.position + (40, 0)
-            ball.body.apply_impulse_at_world_point((npc.shot * 2, -200), ball.body.position)         
-        pg.mixer.Sound("assets/sounds/ball_kick.mp3").play()
+
+        offset = npc.side.offset()
+        direction = npc.side.direction()
+
+        ball.body.position = npc.body.position + (offset, 0)
+
+        if high:
+            impulse = (direction * npc.shot * 2, -200)
+        else:
+            impulse = (direction * npc.shot * 2, 0)
+
+        ball.body.apply_impulse_at_world_point(impulse, ball.body.position)
+        
+        self.kick_sound.play()
         npc.has_ball = False
 
     def wait(self, npc):
-        npc.update_sprite("left")
-
-
-
-
-
+        npc.body.velocity = (0, npc.body.velocity.y)
