@@ -41,7 +41,7 @@ class Player:
 
         self.score = 0
         
-        vs = [(-70, -100), (70, -100), (70, 100), (-70, 100)]
+        vs = [(-70, -130), (70, -130), (70, 100), (-70, 100)]
         self.body = pm.Body(5, pm.moment_for_poly(5, vs))
         
         self.shape = pm.Poly(self.body, vs)

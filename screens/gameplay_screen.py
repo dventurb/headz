@@ -9,7 +9,7 @@ from pitch import Pitch
 from utility_ai import UtilityAI
 from player import Side
 
-class GameMenu:
+class GameplayScreen:
     def __init__(self, screen, clock, gameStateManager):
         self.screen = screen 
         self.clock = clock 
@@ -29,6 +29,8 @@ class GameMenu:
         self.ball_sound = pg.mixer.Sound("assets/sounds/ball_drop.mp3")
         self.goal_sound = pg.mixer.Sound("assets/sounds/goal.mp3")
         self.countdown_sound = pg.mixer.Sound("assets/sounds/countdown.mp3")
+        self.start_whistle_sound = pg.mixer.Sound("assets/sounds/start_whistle.mp3")
+        self.final_whistle_sound = pg.mixer.Sound("assets/sounds/final_whistle.mp3")
 
         self.big_font = pg.font.Font("assets/fonts/shineseiya.ttf", 140)
         self.small_font = pg.font.Font("assets/fonts/shineseiya.ttf", 80)
@@ -39,7 +41,8 @@ class GameMenu:
                     { "Bedas": 0, "Lage": 0, "João David": 25, "Valonga": 65, "Brito": 10}
                 ]
 
-        self.timer = 90
+        self.game_timer = 90
+        self.countdown_timer = 3
         self.timer_event = pg.time.set_timer(pg.USEREVENT, 1000)
 
         self.player = None
@@ -52,7 +55,8 @@ class GameMenu:
 
         self.press_c = False
         self.play_music = False
-        self.start = False
+        self.start_game = False
+        self.end_game = False
 
 
     def run(self, events):
@@ -78,7 +82,7 @@ class GameMenu:
 
 
     def draw(self):
-        if not self.start:
+        if not self.start_game:
             return 
 
         self.screen.blit(self.stadium.image, (0, 0))
@@ -88,7 +92,6 @@ class GameMenu:
         
         if not self.player.has_ball and not self.npc.has_ball:
             self.ball.update()
-            self.ball.draw(self.screen)
 
         self.display_score.draw(self.screen)
 
@@ -97,7 +100,7 @@ class GameMenu:
         self.player_name.draw(self.screen)
         self.npc_name.draw(self.screen)
         
-        self.screen.blit(self.big_font.render(str(self.timer).rjust(3), True, (255, 255, 255)), (690, 20))
+        self.screen.blit(self.big_font.render(str(self.game_timer).rjust(3), True, (255, 255, 255)), (690, 20))
         self.screen.blit(self.small_font.render(str(self.player.score).rjust(3), True, (255, 255, 255)), (600, 80))
         self.screen.blit(self.small_font.render(str(self.npc.score).rjust(3), True, (255, 255, 255)), (840, 80))
 
@@ -106,6 +109,8 @@ class GameMenu:
 
         self.npc.update()
         self.npc.draw(self.screen)
+            
+        self.ball.draw(self.screen)
 
    
     def initialize_game(self):
@@ -131,18 +136,24 @@ class GameMenu:
             # Countdown timer
             # References: https://stackoverflow.com/questions/30720665/countdown-timer-in-pygame
             if event.type == pg.USEREVENT:
-                if self.start and self.timer > 0:
-                    self.timer -= 1 
+                if self.start_game:
+                    if self.game_timer > 0:
+                        self.game_timer -= 1 
 
-                elif not self.start:
-                    if self.timer <= 87: # 3 seconds
-                        self.timer = 90 # reset (90 seconds)
+                    else:
+                        self.final_whistle_sound.play()
+
+                else:
+                    if self.countdown_timer > 0:
+                        self.update_screen_countdown()
+                        self.countdown_timer -= 1 
+
+                    else:
+                        self.start_whistle_sound.play()
                         self.ball.body.position = (768, 100)
                         self.ball.body.velocity = (0, 0)
-                        self.start = True
+                        self.start_game = True
 
-                    self.timer -= 1 
-                    self.update_screen_countdown()
 
             # Check when z, x, c keys was pressed (KEYDOWN) and released (KEYUP)
             if event.type == pg.KEYDOWN:
@@ -174,7 +185,7 @@ class GameMenu:
 
 
     def handle_movement_input(self):
-        if not self.start:
+        if not self.start_game:
             return
 
         # Movement the player
@@ -197,8 +208,10 @@ class GameMenu:
             self.player.body.velocity = (self.player.body.velocity.x, -self.player.jump * 10)    
 
     def update_game(self, dt):
-        if not self.start:
+        if not self.start_game:
             return
+
+        self.keep_ball_in_game()
 
         # Update the image of the ball when player has the ball
         if self.player.has_ball and not self.npc.has_ball:
@@ -219,7 +232,7 @@ class GameMenu:
     
     
     def update_ai(self, dt):
-        if not self.start:
+        if not self.start_game:
             return
 
         self.utility_ai.update(self.ball, self.player, self.npc)
@@ -318,6 +331,7 @@ class GameMenu:
         self.ball.image.rect.center = (player.body.position.x + direction * 80, player.image.rect.bottom - 20)
 
         self.ball.body.position = (player.body.position.x + direction * 80, self.ball.body.position.y)
+        self.ball.update()
 
 
     def update_screen_countdown(self):
@@ -332,7 +346,7 @@ class GameMenu:
         self.screen.blit(self.small_font.render(str(self.npc.score).rjust(3), True, (255, 255, 255)), (840, 80))
         self.player.draw(self.screen)
         self.npc.draw(self.screen)                    
-        countdown = Image(f"assets/countdown/{abs(self.timer - 90)}.png", ((WIDTH / 2), 400))
+        countdown = Image(f"assets/countdown/{self.countdown_timer}.png", ((WIDTH / 2), 400))
         countdown.draw(self.screen)
         self.countdown_sound.play()
 
@@ -382,10 +396,20 @@ class GameMenu:
         self.space.add(self.npc.body, self.npc.shape)
 
 
+    def keep_ball_in_game(self):
+        x, y = self.ball.body.position 
+
+        margin = 50
+
+        if x < -margin or x > WIDTH + margin or y > HEIGHT + 50 or y < -margin:
+            self.ball.body.position = (WIDTH / 2, 100)
+            self.ball.body.velocity = (0, 0)
+
+
 # Callback for collision between the ball and the pitch
 # Used to play sound of the ball hits the ground.
 def ball_hits_pitch(arbiter, space, data):
-    if data.start:
+    if data.start_game:
         data.ball_sound.play() 
     
     #data.ball.body.velocity = (random.choice([100, -100]), data.body.velocity.y)

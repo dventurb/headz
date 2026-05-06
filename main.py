@@ -1,7 +1,7 @@
 import pygame as pg
 
 from game import Game, GameStateManager
-from screens import IntroScreen, MainMenu, PlayerSelectMenu, StadiumSelectMenu, GameMenu
+from screens import IntroScreen, MainScreen, PlayerSelectScreen, StadiumSelectScreen, GameplayScreen
 from config import WIDTH, HEIGHT
 
 def main():
@@ -18,20 +18,20 @@ def main():
     # Title 
     pg.display.set_caption("Headz")
     
-    game = Game(screen, clock, GameStateManager("intro"))
+    game = Game(screen, clock, GameStateManager("intro_screen"))
     
-    game.intro = IntroScreen(game.screen, game.clock, game.gameStateManager) 
-    game.mainMenu = MainMenu(game.screen, game.clock, game.gameStateManager)
-    game.playerSelectMenu = PlayerSelectMenu(game.screen, game.clock, game.gameStateManager)
-    game.stadiumSelectMenu = StadiumSelectMenu(game.screen, game.clock, game.gameStateManager)
-    game.gameMenu = GameMenu(game.screen, game.clock, game.gameStateManager)
+    game.intro_screen = IntroScreen(game.screen, game.clock, game.gameStateManager) 
+    game.main_screen = MainScreen(game.screen, game.clock, game.gameStateManager)
+    game.player_select_screen = PlayerSelectScreen(game.screen, game.clock, game.gameStateManager)
+    game.stadium_select_screen = StadiumSelectScreen(game.screen, game.clock, game.gameStateManager)
+    game.gameplay_screen = GameplayScreen(game.screen, game.clock, game.gameStateManager)
 
     game.states = {
-                "intro": game.intro, 
-                "mainMenu": game.mainMenu, 
-                "playerSelectMenu": game.playerSelectMenu,
-                "stadiumSelectMenu": game.stadiumSelectMenu,
-                "gameMenu": game.gameMenu
+                "intro_screen": game.intro_screen, 
+                "main_screen": game.main_screen, 
+                "player_select_screen": game.player_select_screen,
+                "stadium_select_screen": game.stadium_select_screen,
+                "gameplay_screen": game.gameplay_screen
                }
 
     game.run()

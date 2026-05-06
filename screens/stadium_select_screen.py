@@ -6,16 +6,16 @@ from config import WIDTH, HEIGHT
 from stadium import Stadium, StadiumManager 
 from widgets import ButtonImage, Image
 
-class StadiumSelectMenu:
+class StadiumSelectScreen:
     def __init__(self, screen, clock, gameStateManager):
         self.screen = screen 
         self.clock = clock
         self.gameStateManager = gameStateManager 
 
-        self.background = pg.image.load("assets/backgrounds/select_player_menu.png").convert()
+        self.background = pg.image.load("assets/backgrounds/selection_screen.png").convert()
         
         self.switch_sound = pg.mixer.Sound("assets/sounds/switch.mp3")
-        self.start_sound = pg.mixer.Sound("assets/sounds/start.mp3")
+        self.click_sound = pg.mixer.Sound("assets/sounds/click.mp3")
         
         self.buttons = {
                 "left":  ButtonImage(pg.image.load("assets/buttons/left.png"), (368, 438), click_button_left),
@@ -79,14 +79,14 @@ def click_button_right(self):
 
 
 def click_button_select(self):
-    self.start_sound.play()
+    self.click_sound.play()
     
     pg.mixer.music.stop()
 
     self.gameStateManager.selected_stadium = self.stadiumManager.stadiums[self.current_stadium_index]
 
     # set screen to game play scene
-    self.gameStateManager.set_state("gameMenu")
+    self.gameStateManager.set_state("gameplay_screen")
 
 def update_button(self, button):
     button.check_hover()

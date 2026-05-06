@@ -6,11 +6,11 @@ class Game:
         self.clock = clock 
         self.gameStateManager = gameStateManager
 
-        self.intro = None
-        self.mainMenu = None
-        self.playerSelectMenu = None 
-        self.stadiumSelectMenu = None
-        self.gameMenu = None
+        self.intro_screen = None
+        self.main_screen = None
+        self.player_select_screen = None 
+        self.stadium_select_screen = None
+        self.gameplay_screen = None
 
         self.states = {}
 

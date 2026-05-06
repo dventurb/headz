@@ -5,13 +5,15 @@ from widgets import ButtonImage
 from game import Game, GameStateManager
 from config import WIDTH, HEIGHT
 
-class MainMenu:
+class MainScreen:
     def __init__(self, screen, clock, gameStateManager):
         self.screen = screen 
         self.clock = clock
         self.gameStateManager = gameStateManager 
 
-        self.background = pg.image.load("assets/backgrounds/main_menu.png").convert()
+        self.background = pg.image.load("assets/backgrounds/main_screen.png").convert()
+
+        self.click_sound = pg.mixer.Sound("assets/sounds/click.mp3")
 
         self.play_music = False
 
@@ -37,10 +39,10 @@ class MainMenu:
 
 
 def click_button_start(self):
-    pg.mixer.Sound("assets/sounds/start.mp3").play()
+    self.click_sound.play()
 
-    # Set screen to player select menu
-    self.gameStateManager.set_state("playerSelectMenu")
+    # Set game state to player_select_screen
+    self.gameStateManager.set_state("player_select_screen")
 
 
 def update_button(button):

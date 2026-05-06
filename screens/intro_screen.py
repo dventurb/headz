@@ -38,5 +38,5 @@ class IntroScreen:
 
         self.video.release()
         
-        # End of the Intro, set screen to main menu
-        self.gameStateManager.set_state("mainMenu")
+        # End of the intro_screen, set to main screen
+        self.gameStateManager.set_state("main_screen")
