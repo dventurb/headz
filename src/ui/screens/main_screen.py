@@ -1,9 +1,9 @@
 import pygame as pg
 import cv2
 
-from widgets import ButtonImage
-from game import Game, GameStateManager
-from config import WIDTH, HEIGHT
+from ui.widgets import ButtonImage
+from core.game import Game, GameStateManager
+from core.config import WIDTH, HEIGHT
 
 class MainScreen:
     def __init__(self, screen, clock, gameStateManager):

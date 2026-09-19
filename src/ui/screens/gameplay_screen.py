@@ -2,12 +2,12 @@ import pygame as pg
 import pymunk as pm 
 import random 
 
-from config import WIDTH, HEIGHT, GRAVITY
-from widgets import Image
-from ball import Ball
-from pitch import Pitch
-from utility_ai import UtilityAI
-from player import Side
+from core.config import WIDTH, HEIGHT, GRAVITY
+from ui.widgets import Image
+from entities.ball import Ball
+from entities.pitch import Pitch
+from entities.player import Side
+from ai.utility_ai import UtilityAI
 
 class GameplayScreen:
     def __init__(self, screen, clock, gameStateManager):

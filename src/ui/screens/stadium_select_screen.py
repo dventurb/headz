@@ -1,10 +1,10 @@
 import pygame as pg
 import cv2
 
-from game import Game, GameStateManager
-from config import WIDTH, HEIGHT
-from stadium import Stadium, StadiumManager 
-from widgets import ButtonImage, Image
+from core.game import Game, GameStateManager
+from core.config import WIDTH, HEIGHT
+from entities.stadium import Stadium, StadiumManager 
+from ui.widgets import ButtonImage, Image
 
 class StadiumSelectScreen:
     def __init__(self, screen, clock, gameStateManager):

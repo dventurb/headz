@@ -2,10 +2,10 @@ import pygame as pg
 import cv2
 import random
 
-from game import Game, GameStateManager
-from config import WIDTH, HEIGHT
-from player import Player, PlayerManager 
-from widgets import ButtonImage, Image
+from core.game import Game, GameStateManager
+from core.config import WIDTH, HEIGHT
+from entities.player import Player, PlayerManager 
+from ui.widgets import ButtonImage, Image
 
 class PlayerSelectScreen:
     def __init__(self, screen, clock, gameStateManager):

@@ -2,8 +2,8 @@ import pygame as pg
 from os import sys
 import cv2
 
-from game import Game, GameStateManager
-from config import WIDTH, HEIGHT
+from core.game import Game, GameStateManager
+from core.config import WIDTH, HEIGHT
 
 class IntroScreen:
     def __init__(self, screen, clock, gameStateManager):

@@ -2,7 +2,7 @@ import pygame as pg
 import pymunk as pm
 from enum import Enum
 
-from widgets import Image
+from ui.widgets import Image
 
 class Side(Enum):
     LEFT = 0 

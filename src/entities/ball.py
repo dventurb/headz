@@ -2,7 +2,7 @@ import pygame as pg
 import pymunk as pm
 import random
 
-from widgets import Image
+from ui.widgets import Image
 
 class Ball:
     def __init__(self, space, path : str, position):

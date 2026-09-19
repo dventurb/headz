@@ -2,8 +2,8 @@ import pygame as pg
 import math 
 from enum import Enum
 
-from config import WIDTH, HEIGHT, GRAVITY
-from player import Side
+from core.config import WIDTH, HEIGHT, GRAVITY
+from entities.player import Side
 
 class Role(Enum):
     ATTACK = 0

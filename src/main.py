@@ -1,8 +1,8 @@
 import pygame as pg
 
-from game import Game, GameStateManager
-from screens import IntroScreen, MainScreen, PlayerSelectScreen, StadiumSelectScreen, GameplayScreen
-from config import WIDTH, HEIGHT
+from core.game import Game, GameStateManager
+from core.config import WIDTH, HEIGHT
+from ui.screens import IntroScreen, MainScreen, PlayerSelectScreen, StadiumSelectScreen, GameplayScreen
 
 def main():
     pg.mixer.pre_init(44100, -16, 2, 2048)
